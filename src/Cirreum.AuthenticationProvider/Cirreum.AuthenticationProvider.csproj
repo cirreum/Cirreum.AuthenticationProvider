@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>Cirreum.AuthenticationProvider</AssemblyName>
+		<RootNamespace>Cirreum</RootNamespace>
+		<Description>Authentication track abstractions for the Cirreum framework (three-pillar separation and composition surface). Defines the contracts scheme packages (ApiKey, SignedRequest, SessionTicket) implement: ISchemeSelector + SchemeCategory, CredentialTransport, ISignedRequestAlgorithm + resolver, SessionTicket primitives, [AllowPendingAuth], IAuthenticationBoundaryResolver, IAuthenticationBuilder, IUserProfileEnrichmentBuilder. Pure abstractions plus default impls (ClaimsUserProfileEnricher, DefaultAuthenticationBoundaryResolver) that ship with the contracts.</Description>
+		<PackageTags>cirreum;authentication;provider;abstractions;framework</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!--
+			Cirreum.AuthenticationProvider — Authentication track abstractions.
+			References Cirreum.Kernel + Cirreum.Common downward. AuthenticationContextKeys + the
+			auth event bus (IAuthenticationEvent + handlers + records) live in Kernel and
+			flow in transitively.
+			Does NOT reference other Authentication track abstraction packages (no cross-track; no spine coupling).
+
+			Takes FrameworkReference Microsoft.AspNetCore.App because authentication scheme
+			abstractions (ISchemeSelector) inherently target ASP.NET's authentication middleware —
+			HttpContext is the integration surface. The contract is host-targeted but scheme
+			impl packages (ApiKey, SignedRequest, SessionTicket) and runtime composition
+			consume this assumption uniformly.
+		-->
+		<ProjectReference Include="..\..\..\..\Base\Cirreum.Kernel\src\Cirreum.Kernel\Cirreum.Kernel.csproj" />
+		<ProjectReference Include="..\..\..\..\Common\Cirreum.Common\src\Cirreum.Common\Cirreum.Common.csproj" />
+
+		<!-- Cirreum.Result peer NuGet -->
+		<PackageReference Include="Cirreum.Result" Version="1.0.16" />
+
+		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
+		<PackageReference Include="Cirreum.Providers" Version="1.2.0" />
+
+		<!-- ASP.NET shared framework — for HttpContext, ClaimsPrincipal flow, scheme dispatch -->
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup Label="InternalsVisibleTo" Condition="'$(IsLocalBuild)' == 'true'">
+		<InternalsVisibleTo Include="Cirreum.AuthenticationProvider.Tests" />
+	</ItemGroup>
+
+</Project>
