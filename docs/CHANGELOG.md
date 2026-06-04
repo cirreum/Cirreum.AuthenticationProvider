@@ -23,11 +23,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
   - `[AllowPendingAuth]` — Two-Phase Auth anonymous-pending-auth opt-in marker
   - `AuthenticationSchemes` static constants — well-known scheme name centralization
   - `IRevokedCredentialProvider` — app-side credential revocation hydration
-
-### Pending in follow-up releases
-
-- `ISignedRequestAlgorithm` + `ISignedRequestAlgorithmResolver` — RFC 9421 version-pluggable crypto (deferred to a focused SignedRequest scheme release)
-- `SessionTicket` record + `ISessionTicketIssuer` + `ISessionTicketValidator` + `ISessionStore` + `ISessionTicketPrincipalBinder` — HTTP→long-lived-connection handoff primitives (deferred to a focused SessionTicket scheme release)
+  - `ISignedRequestAlgorithm` + `ISignedRequestAlgorithmResolver` — RFC 9421 version-pluggable crypto consumed by the SignedRequest scheme
+  - `SessionTicket` record + `SessionTicketIssueRequest` + `ISessionTicketIssuer` + `ISessionTicketValidator` + `ISessionTicketPrincipalBinder` — HTTP→long-lived-connection handoff primitives consumed by the SessionTicket scheme
+  - `ISessionStore` — session-ticket persistence; exposes an atomic single-use `ConsumeAsync` (retrieve-and-remove in one operation, so concurrent handshakes can't both redeem a ticket) alongside `StoreAsync` / `RetrieveAsync` / `RemoveAsync` / `RemoveBySubjectAsync`
 
 ### Migration
 
