@@ -29,8 +29,23 @@ public interface ISessionStore {
 	ValueTask StoreAsync(SessionTicket ticket, CancellationToken cancellationToken);
 
 	/// <summary>
-	/// Retrieves the ticket previously stored under <paramref name="ticketValue"/>;
-	/// returns <see langword="null"/> when no matching ticket exists or has expired.
+	/// Atomically retrieves <em>and removes</em> the ticket stored under
+	/// <paramref name="ticketValue"/> in a single operation, returning it on hit or
+	/// <see langword="null"/> when no matching ticket exists or it has expired. This is
+	/// the single-use consume primitive: it MUST be race-free so two concurrent
+	/// handshakes presenting the same ticket cannot both observe a hit (in-memory:
+	/// <c>ConcurrentDictionary.TryRemove(key, out value)</c>; Redis: <c>GETDEL</c>;
+	/// Cosmos: a delete that returns the prior document). A non-atomic
+	/// retrieve-then-remove is <b>not</b> an acceptable implementation — it reintroduces
+	/// the replay window single-use exists to close.
+	/// </summary>
+	ValueTask<SessionTicket?> ConsumeAsync(string ticketValue, CancellationToken cancellationToken);
+
+	/// <summary>
+	/// Retrieves the ticket previously stored under <paramref name="ticketValue"/> without
+	/// consuming it; returns <see langword="null"/> when no matching ticket exists or has
+	/// expired. Use this for reusable-ticket validators; single-use validators use
+	/// <see cref="ConsumeAsync"/> instead.
 	/// </summary>
 	ValueTask<SessionTicket?> RetrieveAsync(string ticketValue, CancellationToken cancellationToken);
 
