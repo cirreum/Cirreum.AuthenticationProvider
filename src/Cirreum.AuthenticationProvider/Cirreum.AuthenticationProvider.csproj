@@ -10,7 +10,7 @@
 	<ItemGroup>
 		<!--
 			Cirreum.AuthenticationProvider — Authentication track abstractions.
-			References Cirreum.Kernel + Cirreum.Common downward. AuthenticationContextKeys + the
+			References Cirreum.Kernel + Cirreum.Contracts downward. AuthenticationContextKeys + the
 			auth event bus (IAuthenticationEvent + handlers + records) live in Kernel and
 			flow in transitively.
 			Does NOT reference other Authentication track abstraction packages (no cross-track; no spine coupling).
@@ -21,14 +21,11 @@
 			impl packages (ApiKey, SignedRequest, SessionTicket) and runtime composition
 			consume this assumption uniformly.
 		-->
-		<ProjectReference Include="..\..\..\..\Base\Cirreum.Kernel\src\Cirreum.Kernel\Cirreum.Kernel.csproj" />
-		<ProjectReference Include="..\..\..\..\Common\Cirreum.Common\src\Cirreum.Common\Cirreum.Common.csproj" />
-
-		<!-- Cirreum.Result peer NuGet -->
-		<PackageReference Include="Cirreum.Result" Version="1.0.16" />
+		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel 1.0.1). -->
+		<PackageReference Include="Cirreum.Contracts" Version="1.1.0" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
-		<PackageReference Include="Cirreum.Providers" Version="1.2.0" />
+		<PackageReference Include="Cirreum.Providers" Version="1.2.1" />
 
 		<!-- ASP.NET shared framework — for HttpContext, ClaimsPrincipal flow, scheme dispatch -->
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
