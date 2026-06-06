@@ -16,7 +16,7 @@ namespace Cirreum.AuthenticationProvider;
 /// schemas.
 /// </para>
 /// <para>
-/// Pairs with <see cref="Events.CredentialRevoked"/> auth events (from
+/// Pairs with <c>Events.CredentialRevoked</c> auth events (from
 /// <c>Cirreum.Kernel</c>): apps publish the event on revocation; the
 /// framework consumes via handlers to update in-memory state; this provider
 /// hydrates that state at boot.

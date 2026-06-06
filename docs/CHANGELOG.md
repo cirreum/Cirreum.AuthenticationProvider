@@ -8,6 +8,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+- **Atomic coordination primitives** (`Cirreum.AuthenticationProvider.Coordination`) — `IReplayGuard` (single-use claim for the SignedRequest strict-nonce posture / replay protection) and `IRequestThrottle` (fixed-window rate limit for the ApiKey `SelfContained` conformance profile). Two interfaces, not one, because store capability is asymmetric: atomic set-if-absent is near-universal, an atomic windowed counter is the discriminator. Ships built-in single-instance implementations — `InMemoryReplayGuard` (lock-free compare-and-swap set-if-absent) and `InMemoryRequestThrottle` (`Interlocked` fixed-window counter) — with monotonic `Environment.TickCount64` deadlines (clock-step-immune), single-sweeper opportunistic eviction (bounds memory under high-cardinality keys), and fail-closed rejection of non-positive windows/limits. Register the backend once via the `AddCoordination(c => c.UseInMemory())` verb on `IAuthenticationBuilder` (a public `CoordinationBuilder` that distributed adapters such as `Cirreum.Authentication.Coordination.Redis` extend with `UseXxx()`); schemes consume only the interface they need. The pure cache-aside `ICacheService` is intentionally NOT the home for these — atomic coordination is an Auth-vertical concern, not a caching one.
+
+### Changed
+
+- Re-pinned `Cirreum.Contracts` 1.1.0 → 1.1.1 (code-first caching foundation; no source impact — none of the renamed/removed cache types are referenced here).
+
 ## [1.0.0] - 2026-06-05
 
 ### Added
