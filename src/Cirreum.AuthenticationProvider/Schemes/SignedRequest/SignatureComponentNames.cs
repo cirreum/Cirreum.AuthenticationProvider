@@ -15,9 +15,6 @@ public static class SignatureComponentNames {
 	/// <summary>The query string including the leading <c>?</c> (derived component <c>@query</c>).</summary>
 	public const string Query = "@query";
 
-	/// <summary>The request authority / Host (derived component <c>@authority</c>), lowercased. Opt-in.</summary>
-	public const string Authority = "@authority";
-
 	/// <summary>The RFC 9530 Content-Digest field (covered as a field component).</summary>
 	public const string ContentDigest = "content-digest";
 

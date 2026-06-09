@@ -21,16 +21,54 @@ public sealed class SignatureBaseComponents {
 	public string Query { get; init; } = "?";
 
 	/// <summary>
-	/// The request authority (host[:port]), lowercased, for the opt-in <c>@authority</c> value; or
-	/// <see langword="null"/> when authority is not available. Required only if <c>@authority</c> is covered.
-	/// </summary>
-	public string? Authority { get; init; }
-
-	/// <summary>
-	/// The covered HTTP field values, keyed by lowercased field name (e.g. <c>content-digest</c>).
+	/// The covered HTTP field values, keyed case-insensitively by field name (e.g. <c>content-digest</c>).
 	/// Used for any non-derived covered component.
 	/// </summary>
 	public IReadOnlyDictionary<string, string> Fields { get; init; } =
 		new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+	/// <summary>
+	/// Builds the neutral components from raw request primitives, applying ALL value canonicalization in
+	/// this one place (ADR-0021 §8) so the server and client adapters perform mechanical extraction only
+	/// and cannot drift. Adapters pass the percent-encoded absolute request path (server
+	/// <c>HttpRequest.Path.ToUriComponent()</c>; client <c>Uri.AbsolutePath</c>) and the raw query string;
+	/// this uppercases the method, normalizes the query to its RFC 9421 form (leading <c>?</c>; a bare
+	/// <c>?</c> when absent), defaults an empty path to <c>/</c>, and stores fields keyed case-insensitively.
+	/// </summary>
+	public static SignatureBaseComponents FromRequest(
+		string method,
+		string path,
+		string? query,
+		IEnumerable<KeyValuePair<string, string>>? fields = null) {
+
+		ArgumentException.ThrowIfNullOrWhiteSpace(method);
+
+		return new SignatureBaseComponents {
+			Method = method.ToUpperInvariant(),
+			Path = string.IsNullOrEmpty(path) ? "/" : path,
+			Query = NormalizeQuery(query),
+			Fields = NormalizeFields(fields),
+		};
+	}
+
+	// RFC 9421 §2.2.7: @query is the query including the leading '?'; no query yields the single char "?".
+	private static string NormalizeQuery(string? query) {
+		if (string.IsNullOrEmpty(query) || query == "?") {
+			return "?";
+		}
+
+		return query[0] == '?' ? query : "?" + query;
+	}
+
+	private static IReadOnlyDictionary<string, string> NormalizeFields(IEnumerable<KeyValuePair<string, string>>? fields) {
+		var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+		if (fields is not null) {
+			foreach (var (name, value) in fields) {
+				map[name] = value;
+			}
+		}
+
+		return map;
+	}
 
 }

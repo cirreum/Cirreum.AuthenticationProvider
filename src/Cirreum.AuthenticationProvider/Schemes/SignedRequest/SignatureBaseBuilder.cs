@@ -103,10 +103,6 @@ public static class SignatureBaseBuilder {
 				return components.Path;
 			case SignatureComponentNames.Query:
 				return components.Query;
-			case SignatureComponentNames.Authority:
-				return components.Authority
-					?? throw new InvalidOperationException(
-						"The '@authority' component is covered by the signature but the request authority is unavailable.");
 			default:
 				if (component.StartsWith('@')) {
 					throw new InvalidOperationException($"Unsupported derived signature component '{component}'.");
