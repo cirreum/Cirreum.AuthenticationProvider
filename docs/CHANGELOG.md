@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-03
+
 ### Added
 
 - **`auth.AddCoordination(...)` forwarder** — a thin auth-track convenience on `IAuthenticationBuilder` over the neutral `Cirreum.Coordination` primitive, exposing `services.AddCoordination(...)` as `auth.AddCoordination(c => c.UseInMemory())` (or `c => c.UseRedis()` with `Cirreum.Coordination.Redis` referenced) so auth schemes can register a coordination backend inside the `AddAuthentication` composition. Schemes pull the requirement they need — SignedRequest's strict-nonce posture consumes `IReplayGuard`; a fixed-window `IRequestThrottle` is available for rate-limited schemes. The coordination primitives themselves live in the standalone, dependency-light `Cirreum.Coordination` package (usable outside authentication), not here — atomic coordination is a reusable primitive, not an auth-only concern.
