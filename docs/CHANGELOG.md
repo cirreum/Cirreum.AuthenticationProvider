@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-04
+
 ### Fixed
 
 - **Relocated the profile-enrichment builder family to `Cirreum.Contracts`/`Cirreum.Domain`.** `IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder`, and `ClaimsUserProfileEnricher` are removed from this package. They're host-agnostic — any host may enrich a user's profile after authentication, regardless of which (or whether any) auth scheme is active — so they belong in the spine, not the Authentication feature track. Landing them here meant `IUserProfileEnrichmentBuilder` inherited this package's `IAuthenticationBuilder`, which carries server-only `AuthBuilder`/`Configuration` members for the `AddAuthentication()` composition surface — silently breaking every Blazor WebAssembly implementer (there's no server-side `AuthenticationBuilder` on a WASM client). `IGraphEnabledBuilder`/`IExternalGraphEnabledBuilder` only shipped here in `v1.1.1`, hours before this fix; `IUserProfileEnrichmentBuilder`/`ClaimsUserProfileEnricher` shipped since `v1.0.0`. Now in `Cirreum.Contracts 1.2.0` (interfaces) and `Cirreum.Domain 1.2.0` (default enricher impl).
