@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<AssemblyName>Cirreum.AuthenticationProvider</AssemblyName>
 		<RootNamespace>Cirreum</RootNamespace>
-		<Description>Authentication track abstractions for the Cirreum framework (three-pillar separation and composition surface). Defines the contracts scheme packages (ApiKey, SignedRequest, SessionTicket) implement: ISchemeSelector + SchemeCategory, CredentialTransport, ISignedRequestAlgorithm + resolver, SessionTicket primitives, [AllowPendingAuth], IAuthenticationBoundaryResolver, IAuthenticationBuilder, IUserProfileEnrichmentBuilder. Pure abstractions plus default impls (ClaimsUserProfileEnricher, DefaultAuthenticationBoundaryResolver) that ship with the contracts.</Description>
+		<Description>Authentication track abstractions for the Cirreum framework (three-pillar separation and composition surface). Defines the contracts scheme packages (ApiKey, SignedRequest, SessionTicket) implement: ISchemeSelector + SchemeCategory, CredentialTransport, ISignedRequestAlgorithm + resolver, SessionTicket primitives, [AllowPendingAuth], IAuthenticationBoundaryResolver, IAuthenticationBuilder. Pure abstractions plus a default impl (DefaultAuthenticationBoundaryResolver) that ships with the contracts. Host-agnostic profile enrichment (IUserProfileEnrichmentBuilder, ClaimsUserProfileEnricher) lives in Cirreum.Contracts/Cirreum.Domain, not here.</Description>
 		<PackageTags>cirreum;authentication;provider;abstractions;framework</PackageTags>
 	</PropertyGroup>
 
@@ -22,7 +22,7 @@
 			consume this assumption uniformly.
 		-->
 		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel 1.0.1). -->
-		<PackageReference Include="Cirreum.Contracts" Version="1.1.1" />
+		<PackageReference Include="Cirreum.Contracts" Version="1.2.0" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
 		<PackageReference Include="Cirreum.Providers" Version="1.2.2" />

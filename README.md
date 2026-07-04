@@ -29,9 +29,9 @@
 
 **Compositions:**
 - `IAuthenticationBoundaryResolver` — resolves Global vs Tenant vs None per the configured PrimaryScheme
-- `ClaimsUserProfileEnricher` — default `IUserProfileEnricher` impl
-- `IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder` — extensibility seams for claim enrichment scenarios
 - `IRevokedCredentialProvider` — app-side credential revocation hydration
+
+Profile enrichment (`IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder`, `ClaimsUserProfileEnricher`) is **not** part of this package — it's host-agnostic (any host may enrich a profile post-authentication, regardless of which — or whether any — auth scheme is active) and lives in `Cirreum.Contracts`/`Cirreum.Domain` instead.
 
 ## Where it fits
 
