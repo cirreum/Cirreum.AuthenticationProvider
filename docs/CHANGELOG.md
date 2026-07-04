@@ -8,6 +8,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Fixed
+
+- **`IGraphEnabledBuilder` / `IExternalGraphEnabledBuilder` actually ship now.** The `v1.0.0` changelog and README both documented these as relocated here from `Cirreum.Core 5.x` alongside `IAuthenticationBuilder`/`IUserProfileEnrichmentBuilder`, but the two Graph interfaces were never actually ported — only claimed. They remained real only in the (now-archived) legacy `Cirreum.Core` source, silently blocking `Cirreum.Graph.Provider`'s foundation cutover. Ported verbatim (same shape, root `Cirreum` namespace) so existing `Cirreum.Core`-based consumers see no source break when they switch their reference.
+
 ## [1.1.0] - 2026-07-03
 
 ### Added
