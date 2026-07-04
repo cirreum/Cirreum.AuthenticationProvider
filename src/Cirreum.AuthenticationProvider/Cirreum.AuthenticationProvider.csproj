@@ -25,7 +25,7 @@
 		<PackageReference Include="Cirreum.Contracts" Version="1.1.1" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
-		<PackageReference Include="Cirreum.Providers" Version="1.2.1" />
+		<PackageReference Include="Cirreum.Providers" Version="1.2.2" />
 
 		<!-- Atomic-coordination primitives (IReplayGuard / IRequestThrottle / CoordinationBuilder /
 		     AddCoordination). The auth.AddCoordination(...) sugar forwards to the neutral primitive;
