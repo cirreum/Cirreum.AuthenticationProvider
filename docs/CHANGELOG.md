@@ -8,6 +8,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Fixed
+
+- Renamed `AddCoordination` to `ConfigureCoordination` on `IAuthenticationBuilder`, matching the framework's `Configure*` convention (adjusting an already-implied capability — see `ConfigureCors`/`ConfigureConductor`) rather than `Add*` (registering a new one). No functional change — same signature, same forward to `services.AddCoordination(...)`. Source-breaking: update any call site from `auth.AddCoordination(...)` to `auth.ConfigureCoordination(...)`. Ships as a patch — no known external consumers of the verb yet, no `[Obsolete]` shim, no migration doc. Also fixes a stale doc/comment reference to ApiKey's `SelfContained` profile, dropped in the 2026-06-08 redesign.
+
 ## [1.1.2] - 2026-07-04
 
 ### Fixed

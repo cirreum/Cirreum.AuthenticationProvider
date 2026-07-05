@@ -22,15 +22,15 @@
 			consume this assumption uniformly.
 		-->
 		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel 1.0.1). -->
-		<PackageReference Include="Cirreum.Contracts" Version="1.2.0" />
+		<PackageReference Include="Cirreum.Contracts" Version="1.2.1" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
 		<PackageReference Include="Cirreum.Providers" Version="1.2.2" />
 
-		<!-- Atomic-coordination primitives (IReplayGuard / IRequestThrottle / CoordinationBuilder /
-		     AddCoordination). The auth.AddCoordination(...) sugar forwards to the neutral primitive;
-		     schemes that need coordination (SignedRequest strict-nonce, ApiKey SelfContained) consume it. -->
-		<PackageReference Include="Cirreum.Coordination" Version="1.0.0" />
+		<!-- Coordination primitives (IReplayGuard / IRequestThrottle / ISignalBroadcaster / CoordinationBuilder /
+		     AddCoordination). The auth.ConfigureCoordination(...) sugar forwards to the neutral primitive;
+		     schemes that need coordination (SignedRequest strict-nonce) consume it. -->
+		<PackageReference Include="Cirreum.Coordination" Version="1.1.0" />
 
 		<!-- ASP.NET shared framework — for HttpContext, ClaimsPrincipal flow, scheme dispatch -->
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />

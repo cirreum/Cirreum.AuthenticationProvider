@@ -14,10 +14,10 @@ public sealed class CoordinationRegistrationTests {
 	}
 
 	[Fact]
-	public void Auth_AddCoordination_forwards_backend_selection_to_the_service_collection() {
+	public void Auth_ConfigureCoordination_forwards_backend_selection_to_the_service_collection() {
 		var services = new ServiceCollection();
 
-		BuilderOver(services).AddCoordination(c => c.UseInMemory());
+		BuilderOver(services).ConfigureCoordination(c => c.UseInMemory());
 
 		using var provider = services.BuildServiceProvider();
 		provider.GetRequiredService<IReplayGuard>().Should().NotBeNull();
@@ -27,17 +27,17 @@ public sealed class CoordinationRegistrationTests {
 	}
 
 	[Fact]
-	public void Auth_AddCoordination_with_a_null_builder_throws() {
-		var act = () => ((IAuthenticationBuilder)null!).AddCoordination(c => c.UseInMemory());
+	public void Auth_ConfigureCoordination_with_a_null_builder_throws() {
+		var act = () => ((IAuthenticationBuilder)null!).ConfigureCoordination(c => c.UseInMemory());
 
 		act.Should().Throw<ArgumentNullException>();
 	}
 
 	[Fact]
-	public void Auth_AddCoordination_with_a_null_configure_throws() {
+	public void Auth_ConfigureCoordination_with_a_null_configure_throws() {
 		var services = new ServiceCollection();
 
-		var act = () => BuilderOver(services).AddCoordination(null!);
+		var act = () => BuilderOver(services).ConfigureCoordination(null!);
 
 		act.Should().Throw<ArgumentNullException>();
 	}
