@@ -43,7 +43,7 @@ public static class CoordinationAuthenticationBuilderExtensions {
 
 		// Default the coordination scope to the canonical {app}:{env}. TryAdd, and
 		// WithScope(...) uses Replace — so an explicit scope wins in any order.
-		builder.Services.TryAddSingleton<CoordinationScope>(static sp => {
+		builder.Services.TryAddSingleton(static sp => {
 			var environment = sp.GetService<IDomainEnvironment>()
 				?? throw new InvalidOperationException(
 					"The default CoordinationScope derives {app}:{env} from IDomainEnvironment, " +
