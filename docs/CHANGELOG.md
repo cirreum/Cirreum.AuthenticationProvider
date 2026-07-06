@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-06
+
 ### Added
 
 - `ConfigureCoordination(...)` now defaults the `CoordinationScope` to the canonical `{applicationName}:{environmentName}` (from `IDomainEnvironment`) when none is registered, so applications and environments sharing a distributed coordination backend never share replay/throttle/signal state. An explicit `configure(c => c.WithScope(...))` wins in any order (the default is `TryAdd`; `WithScope` replaces); the in-memory backend ignores the scope. Matches the same default `auth.AddEventCoordination()` applies in `Cirreum.Runtime.Authentication`.
