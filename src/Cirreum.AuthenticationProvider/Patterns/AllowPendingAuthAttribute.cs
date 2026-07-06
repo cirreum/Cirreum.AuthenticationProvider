@@ -17,7 +17,8 @@ namespace Cirreum.AuthenticationProvider;
 /// Without this attribute, the framework's standard authentication pipeline rejects
 /// unauthenticated requests with 401. The runtime composition validates at boot time
 /// that <c>[AllowPendingAuth]</c>-decorated endpoints are paired with a configured
-/// promotion path (typically a runtime-registered <c>TwoPhaseAuth.Promote</c> usage).
+/// promotion path (typically a <c>connection.Promote(principal)</c> usage — the
+/// Two-Phase Auth extension in <c>Cirreum.Runtime.AuthenticationProvider</c>).
 /// </para>
 /// </remarks>
 [AttributeUsage(
