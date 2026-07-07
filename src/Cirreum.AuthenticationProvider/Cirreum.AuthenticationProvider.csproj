@@ -22,7 +22,7 @@
 			consume this assumption uniformly.
 		-->
 		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel 1.0.1). -->
-		<PackageReference Include="Cirreum.Contracts" Version="1.4.2" />
+		<PackageReference Include="Cirreum.Contracts" Version="1.4.3" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
 		<PackageReference Include="Cirreum.Providers" Version="1.2.2" />
