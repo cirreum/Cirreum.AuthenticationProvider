@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-07-18
+
 ### Updated
 
 - Updated NuGet packages.
