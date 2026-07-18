@@ -25,12 +25,12 @@
 		<PackageReference Include="Cirreum.Contracts" Version="1.4.3" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
-		<PackageReference Include="Cirreum.Providers" Version="1.2.2" />
+		<PackageReference Include="Cirreum.Providers" Version="1.2.3" />
 
 		<!-- Coordination primitives (IReplayGuard / IRequestThrottle / ISignalBroadcaster / CoordinationBuilder /
 		     AddCoordination). The auth.ConfigureCoordination(...) sugar forwards to the neutral primitive;
 		     schemes that need coordination (SignedRequest strict-nonce) consume it. -->
-		<PackageReference Include="Cirreum.Coordination" Version="1.2.0" />
+		<PackageReference Include="Cirreum.Coordination" Version="1.2.1" />
 
 		<!-- ASP.NET shared framework — for HttpContext, ClaimsPrincipal flow, scheme dispatch -->
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
