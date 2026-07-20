@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-20
+
 ### Changed
 
 - **Authentication-boundary resolution relocated to `Cirreum.Kernel` (ADR-0032).**
