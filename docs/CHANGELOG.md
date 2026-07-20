@@ -8,6 +8,33 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+- `AudienceSchemeRegistration` — an immutable `audience → scheme` routing contribution
+  record. Audience-based registrars now register one per enabled instance directly into
+  the service collection; the runtime's audience selector aggregates the set at
+  construction and the umbrella validates it at composition close (ADR-0031).
+
+### Changed
+
+- **Audience dispatch data is container-owned (ADR-0031).** The mutable
+  `IAudienceSchemeMap` / `DefaultAudienceSchemeMap` pair is removed outright — under the
+  umbrella composition its find-or-create reuse check could never succeed, so each
+  audience instance silently created a fresh map and only the last-registered audience
+  remained routable (every other audience-based scheme 401'd as `Cirreum.Ambiguous`).
+  The types were unshippable in practice and no correct program could have consumed
+  them; removal ships in this minor as a deliberate, recorded SemVer deviation while
+  the authentication rewrite completes. Custom audience routing belongs on the
+  `ISchemeSelector` seam; manual mappings are contributed via
+  `services.AddSingleton(new AudienceSchemeRegistration(...))`.
+
+### Fixed
+
+- The registrar base's duplicate-instance-key guard was process-global static state:
+  a second host composed in the same process (the integration-test norm) rejecting a
+  legitimately re-used instance key with "already been registered". Guard state now
+  lives in the service collection, so hosts are fully isolated (ADR-0028 principle).
+
 ## [1.2.2] - 2026-07-18
 
 ### Updated

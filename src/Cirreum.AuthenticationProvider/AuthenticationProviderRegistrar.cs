@@ -39,8 +39,6 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 	where TInstanceSettings : AuthenticationProviderInstanceSettings
 	where TSettings : AuthenticationProviderSettings<TInstanceSettings> {
 
-	private static readonly Dictionary<string, string> ProcessedInstances = [];
-
 	/// <inheritdoc/>
 	public ProviderType ProviderType => ProviderType.Authentication;
 
@@ -91,10 +89,15 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 		IConfiguration configuration,
 		AuthenticationBuilder authBuilder) {
 
+		// Duplicate-registration guard, scoped to this service collection — state lives
+		// in the composition, not the process, so multiple hosts in one process are
+		// fully isolated.
 		var providerRegistrationKey = $"Cirreum.{this.ProviderType}.{this.ProviderName}::{key}";
-		if (!ProcessedInstances.TryAdd(providerRegistrationKey, $"{settings.GetHashCode()}")) {
+		if (services.Any(d => d.ImplementationInstance is ProcessedInstanceKey processed
+			&& processed.Value == providerRegistrationKey)) {
 			throw new InvalidOperationException($"A service with the key of '{key}' has already been registered.");
 		}
+		services.AddSingleton(new ProcessedInstanceKey(providerRegistrationKey));
 
 		if (settings is null) {
 			throw new InvalidOperationException($"Missing required settings for the service '{key}'");

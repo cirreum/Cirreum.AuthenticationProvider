@@ -44,11 +44,15 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 				$"Audience-based provider instance '{key}' requires an Audience.");
 		}
 
-		// Populate the framework's audience → scheme registry consumed by the
-		// framework-shipped JwtAudienceSchemeSelector. Every audience-based scheme
-		// picks up this registration through the base — no per-scheme wiring required.
-		var audienceMap = GetOrAddAudienceSchemeMap(services);
-		audienceMap.Register(settings.Audience, settings.Scheme);
+		// Contribute this instance's audience → scheme routing entry. The
+		// framework-shipped JwtAudienceSchemeSelector aggregates the full set from the
+		// container at construction; the umbrella validates it at composition close.
+		// Every audience-based scheme picks this up through the base — no per-scheme
+		// wiring required.
+		services.AddSingleton(new AudienceSchemeRegistration(
+			settings.Audience,
+			settings.Scheme,
+			this.ProviderName));
 
 		var instanceSection = configuration.GetSection(this.GetInstanceSectionPath(key));
 
@@ -57,17 +61,6 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 		} else {
 			this.AddAuthenticationForWebApi(instanceSection, settings, authBuilder);
 		}
-	}
-
-	private static IAudienceSchemeMap GetOrAddAudienceSchemeMap(IServiceCollection services) {
-		var existing = services.FirstOrDefault(d => d.ServiceType == typeof(IAudienceSchemeMap));
-		if (existing?.ImplementationInstance is IAudienceSchemeMap map) {
-			return map;
-		}
-
-		map = new DefaultAudienceSchemeMap();
-		services.AddSingleton(map);
-		return map;
 	}
 
 	/// <summary>

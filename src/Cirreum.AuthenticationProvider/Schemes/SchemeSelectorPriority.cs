@@ -13,10 +13,10 @@ namespace Cirreum.AuthenticationProvider;
 /// <para>
 /// Slot 900 is reserved for the framework-shipped <c>JwtAudienceSchemeSelector</c> — the
 /// routing-to-foreign-handler bridge that dispatches JWTs to ASP.NET's <c>JwtBearer</c>
-/// handler (via Microsoft Identity Web or equivalent) by looking up the <c>aud</c> claim
-/// in <see cref="IAudienceSchemeMap"/>. The numeric gap from 400 to 900 reflects that
-/// this selector doesn't dispatch to a Cirreum-shipped handler — it routes to a foreign
-/// one.
+/// handler (via Microsoft Identity Web or equivalent) by matching the <c>aud</c> claim
+/// against the registered <see cref="AudienceSchemeRegistration"/> set. The numeric gap
+/// from 400 to 900 reflects that this selector doesn't dispatch to a Cirreum-shipped
+/// handler — it routes to a foreign one.
 /// </para>
 /// <para>
 /// Gaps in the numbering (500-800) are available for future Cirreum schemes (mTLS,
@@ -42,11 +42,11 @@ public static class SchemeSelectorPriority {
 	public const int External = 400;
 
 	/// <summary>
-	/// JWT-audience routing selector — looks up the <c>aud</c> claim in
-	/// <see cref="IAudienceSchemeMap"/> and routes to a foreign handler (ASP.NET
-	/// <c>JwtBearer</c> via MS Identity Web). Numeric gap from 400 to 900 reflects
-	/// the structural distinction between scheme-impl-backed selectors and this
-	/// routing-to-foreign-handler bridge.
+	/// JWT-audience routing selector — matches the <c>aud</c> claim against the
+	/// registered <see cref="AudienceSchemeRegistration"/> set and routes to a foreign
+	/// handler (ASP.NET <c>JwtBearer</c> via MS Identity Web). Numeric gap from 400 to
+	/// 900 reflects the structural distinction between scheme-impl-backed selectors and
+	/// this routing-to-foreign-handler bridge.
 	/// </summary>
 	public const int Audience = 900;
 
