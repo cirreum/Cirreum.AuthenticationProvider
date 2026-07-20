@@ -28,10 +28,10 @@
 - `[AllowPendingAuth]` — opt-in for Two-Phase Auth's anonymous-pending-auth pattern
 
 **Compositions:**
-- `IAuthenticationBoundaryResolver` — resolves Global vs Tenant vs None per the configured PrimaryScheme
+- `AudienceSchemeRegistration` — the audience → scheme routing contribution audience-based registrars add per instance
 - `IRevokedCredentialProvider` — app-side credential revocation hydration
 
-Profile enrichment (`IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder`, `ClaimsUserProfileEnricher`) is **not** part of this package — it's host-agnostic (any host may enrich a profile post-authentication, regardless of which — or whether any — auth scheme is active) and lives in `Cirreum.Contracts`/`Cirreum.Domain` instead.
+Profile enrichment (`IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder`, `ClaimsUserProfileEnricher`) is **not** part of this package — it's host-agnostic (any host may enrich a profile post-authentication, regardless of which — or whether any — auth scheme is active) and lives in `Cirreum.Contracts`/`Cirreum.Domain` instead. The same reasoning applies to authentication-boundary resolution (`IAuthenticationBoundaryResolver`, `AuthenticationBoundary`): the server user-state pipeline consumes it whether or not any authentication scheme is composed, so it lives in `Cirreum.Kernel`.
 
 ## Where it fits
 

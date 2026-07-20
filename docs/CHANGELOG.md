@@ -8,6 +8,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Changed
+
+- **Authentication-boundary resolution relocated to `Cirreum.Kernel` (ADR-0032).**
+  `IAuthenticationBoundaryResolver` and `DefaultAuthenticationBoundaryResolver` move
+  to the Kernel's `Cirreum.Security` namespace, beside the `AuthenticationBoundary`
+  enum, `IUserState`, and `UserStateBase` they operate on; the never-called
+  `AddAuthenticationBoundaryResolver` extension is deleted. The seam is spine
+  infrastructure — the server user-state pipeline consumes it whether or not any
+  authentication scheme is composed — and its placement here forced the services
+  spine to reference this package for one interface. Removal ships in a minor under
+  the same recorded rewrite-completion deviation as 1.3.0; implementers change
+  `using Cirreum.AuthenticationProvider.Security` to `using Cirreum.Security`.
+  Registration is now consumer-owned: `Cirreum.Services.Server` registers the
+  default, and `Cirreum.Runtime.Authentication` registers the scheme-aware
+  primary-scheme resolver restored under the same ADR.
+
 ## [1.3.0] - 2026-07-20
 
 ### Added
