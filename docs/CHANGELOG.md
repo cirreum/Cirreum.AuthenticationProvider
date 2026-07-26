@@ -8,6 +8,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Removed
+
+- **`AuthenticationDiagnostics`** — a public static class whose sole member,
+  `DiagnosticName = "Cirreum.AuthenticationProvider"`, had **no references anywhere in the
+  framework**. Its documentation claimed the `ActivitySource` and `Meter` were "created in the
+  runtime composition" and that the constant existed "so both agree on the identifier"; neither was
+  true. The runtime's authentication telemetry uses `Cirreum.Authentication`, and that name is what
+  `CirreumTelemetry` registers.
+
+  Worse than dead: the name it published is not among the sources or meters Kernel's `AddCirreum()`
+  subscribes, so a future author who reached for it — exactly as its documentation invited — would
+  have created a source with no listener and shipped telemetry that records into the void with
+  nothing failing to say so. The same defect that left identity-provisioning telemetry unobservable
+  until `Cirreum.Kernel` 1.3.0.
+
+  Telemetry names belong to `CirreumTelemetry` in `Cirreum.Kernel`, which is both the single
+  literal and the registration. See `MIGRATION-v2.md`.
+
 ## [1.4.2] - 2026-07-24
 
 ### Updated
