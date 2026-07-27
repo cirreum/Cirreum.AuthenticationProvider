@@ -1,6 +1,75 @@
 # Cirreum.AuthenticationProvider v1 → v2 Migration
 
-## Why v2
+v2 carries two breaking changes: `IRevokedCredentialProvider` now yields revocation records rather
+than bare identifiers, and the dead `AuthenticationDiagnostics` class is removed.
+
+---
+
+## 1. `IRevokedCredentialProvider` yields records
+
+| Before | After |
+|---|---|
+| `IAsyncEnumerable<string> GetRevokedCredentialIdsAsync(…)` | `IAsyncEnumerable<RevokedCredential> GetRevokedCredentialsAsync(…)` |
+
+```csharp
+public readonly record struct RevokedCredential(
+	string CredentialId,
+	DateTimeOffset? ExpiresAt = null);
+```
+
+### Why
+
+The contract could only say *which* credentials were revoked. So a revocation hydrated at boot was
+recorded with no expiry and retained until the process restarted — while an entry created by a live
+`CredentialRevoked` event self-evicted on the credential's own expiry, because
+`IApiKeyDenylist.Revoke(id, expiresAt)` has always accepted one.
+
+The plumbing existed at both ends. The contract in the middle was the only thing that couldn't carry
+expiry, so the two paths behaved differently for no reason a consumer could see.
+
+### Migration
+
+Applications implementing the interface change the member name and wrap each identifier:
+
+```csharp
+// Before
+public async IAsyncEnumerable<string> GetRevokedCredentialIdsAsync(
+	[EnumeratorCancellation] CancellationToken cancellationToken = default) {
+
+	await foreach (var row in _db.RevokedCredentials.AsAsyncEnumerable()) {
+		yield return row.CredentialId;
+	}
+}
+
+// After — minimum change, behavior identical
+public async IAsyncEnumerable<RevokedCredential> GetRevokedCredentialsAsync(
+	[EnumeratorCancellation] CancellationToken cancellationToken = default) {
+
+	await foreach (var row in _db.RevokedCredentials.AsAsyncEnumerable()) {
+		yield return new RevokedCredential(row.CredentialId);
+	}
+}
+
+// Better — supply the credential's own expiry where the store knows it
+		yield return new RevokedCredential(row.CredentialId, row.CredentialExpiresAt);
+```
+
+**Supplying `ExpiresAt` is optional and additive.** Omit it and you get exactly the previous
+behavior: the entry is retained until restart. Supply it and the entry self-evicts once the
+credential could no longer authenticate anyway, which is the point of the change — it directly
+relieves the memory pressure that a large or long-lived revoked population creates.
+
+Note this is the **credential's** expiry, not the revocation's. A revocation never expires early;
+the entry is dropped only when the credential itself is already unusable.
+
+The member is renamed rather than overloaded so this surfaces as a clean compile error, rather than
+a type mismatch on a method whose name still says "Ids".
+
+---
+
+## 2. `AuthenticationDiagnostics` is removed
+
+## Why it existed, and why removal rather than deprecation
 
 One public class is removed: `AuthenticationDiagnostics`. It had no references anywhere in the
 framework, and the name it published was a trap for whoever used it next.

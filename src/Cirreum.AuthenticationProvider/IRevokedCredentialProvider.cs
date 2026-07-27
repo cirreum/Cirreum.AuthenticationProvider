@@ -36,22 +36,26 @@ namespace Cirreum.AuthenticationProvider;
 /// revocation stays until that credential leaves issuance.
 /// </para>
 /// <para>
-/// No "un-revoke" signal is needed. The set re-hydrates on restart, and entries created by a live
-/// <c>CredentialRevoked</c> event self-evict on the credential's own expiry. Note that entries
-/// hydrated <em>here</em> cannot: this contract yields ids without expiry, so a boot-hydrated
-/// revocation is retained until the next restart. That is deliberate — over-retention is safe,
-/// under-revocation is not — and it is why the set wants pruning at the source.
+/// No "un-revoke" signal is needed. The set re-hydrates on restart, and an entry self-evicts once
+/// the credential's own expiry passes — for entries hydrated here as well as for those created by a
+/// live <c>CredentialRevoked</c> event, provided <see cref="RevokedCredential.ExpiresAt"/> is
+/// supplied. Omit it and the entry is retained until restart, which is safe but keeps memory that
+/// pruning at the source would release.
 /// </para>
 /// </remarks>
 public interface IRevokedCredentialProvider {
 
 	/// <summary>
-	/// Returns all credential IDs currently revoked. The shape of the credential ID
-	/// is scheme-specific (API key id, JWT jti, keypair fingerprint) — the runtime
-	/// consumer correlates against its own credential indexes.
+	/// Returns every currently revoked credential — its identifier, and when it expires on its own.
 	/// </summary>
+	/// <remarks>
+	/// Supplying <see cref="RevokedCredential.ExpiresAt"/> lets a hydrated revocation self-evict once
+	/// the credential could no longer authenticate anyway, matching what a live
+	/// <c>CredentialRevoked</c> event already achieves. Leaving it <see langword="null"/> is safe and
+	/// means "retain until restart" — the trade is memory, never a re-admitted credential.
+	/// </remarks>
 	/// <param name="cancellationToken">Cancellation token.</param>
-	IAsyncEnumerable<string> GetRevokedCredentialIdsAsync(
+	IAsyncEnumerable<RevokedCredential> GetRevokedCredentialsAsync(
 		CancellationToken cancellationToken = default);
 
 }

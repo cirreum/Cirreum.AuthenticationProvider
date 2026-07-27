@@ -1,6 +1,39 @@
-# Cirreum.AuthenticationProvider 2.0.0 — One Removal, and a Warning Worth Reading
+# Cirreum.AuthenticationProvider 2.0.0 — Revocations Can Now Expire
 
-## What breaks
+## Why this release exists
+
+`IRevokedCredentialProvider` could only say *which* credentials were revoked. That left the two
+revocation paths behaving differently for a reason no consumer could see.
+
+A revocation arriving as a live `CredentialRevoked` event carries the credential's expiry, so the
+in-memory denylist drops the entry once the credential could no longer authenticate anyway —
+`IApiKeyDenylist.Revoke(id, expiresAt)` has always accepted one. A revocation **hydrated at boot**
+had no expiry to pass, so it was retained until the process restarted.
+
+The plumbing existed at both ends. The contract in the middle was the only thing that couldn't carry
+expiry.
+
+```csharp
+public readonly record struct RevokedCredential(
+	string CredentialId,
+	DateTimeOffset? ExpiresAt = null);
+
+IAsyncEnumerable<RevokedCredential> GetRevokedCredentialsAsync(CancellationToken ct = default);
+```
+
+**Supplying the expiry is optional.** Omit it and behavior is exactly as before — the entry is
+retained until restart, which is safe: over-retention costs memory, under-revocation would re-admit a
+credential. Supply it and the entry self-evicts, which is what makes a large or long-lived revoked
+population affordable to hold in memory.
+
+It is a `readonly record struct` because this streams through `IAsyncEnumerable<T>` on the boot path,
+and the populations that make expiry worth carrying are exactly the large ones — where an allocation
+per revocation is the cost worth not paying.
+
+The member is renamed rather than overloaded, so an implementer gets a clean compile error instead of
+a type mismatch on a method whose name still says "Ids".
+
+## Also removed
 
 **`AuthenticationDiagnostics` is removed.** That is the whole of the breaking change, and almost
 certainly nothing to do — the class had **no references anywhere**, in this framework or in the one

@@ -8,6 +8,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Changed
+
+- **`IRevokedCredentialProvider` yields revocation records instead of bare identifiers.**
+  `GetRevokedCredentialIdsAsync` → `GetRevokedCredentialsAsync`, returning
+  `IAsyncEnumerable<RevokedCredential>` where `RevokedCredential` is a new
+  `readonly record struct` carrying the credential id and its optional expiry.
+
+  Previously the contract could only express *which* credentials were revoked, so a boot-hydrated
+  revocation was recorded with no expiry and retained until the process restarted — while an entry
+  created by a live `CredentialRevoked` event self-evicted on the credential's own expiry, because
+  `IApiKeyDenylist.Revoke(id, expiresAt)` has always accepted one. The hydration path was the only
+  place that couldn't supply it. It now can.
+
+  Behavior is unchanged for a provider that supplies no expiry: `null` means "retain until restart",
+  which is safe — over-retention costs memory, under-revocation would re-admit a credential.
+
+  A `readonly record struct` rather than a class because this streams through `IAsyncEnumerable<T>`
+  on the boot path, and the populations that make expiry worth carrying are exactly the large ones.
+
+  The method is renamed rather than overloaded so an implementer gets a clean compile error instead
+  of a type mismatch on a member whose name still says "Ids". See `MIGRATION-v2.md`.
+
 ### Added
 
 - `IRevokedCredentialProvider` now documents the operational constraint that was previously only
