@@ -21,6 +21,27 @@ namespace Cirreum.AuthenticationProvider;
 /// framework consumes via handlers to update in-memory state; this provider
 /// hydrates that state at boot.
 /// </para>
+/// <para>
+/// <b>Keep the persisted revoked set bounded.</b> Everything this provider yields is held in
+/// memory for the lifetime of the process, and the in-memory denylist is capacity-bounded — on
+/// saturation it <em>fails authentication closed</em> rather than silently forgetting a
+/// revocation. An unbounded revoked set therefore degrades into refused authentication, not into
+/// stale state.
+/// </para>
+/// <para>
+/// The safe pruning rule is the same one the denylist applies to itself: remove a revocation once
+/// the credential could no longer authenticate anyway — past its own expiry plus any validation
+/// grace window, or once it has been deleted or rotated out of issuance entirely. <b>Never prune a
+/// live, non-expired credential's revocation</b>; doing so re-admits it. A non-expiring credential's
+/// revocation stays until that credential leaves issuance.
+/// </para>
+/// <para>
+/// No "un-revoke" signal is needed. The set re-hydrates on restart, and entries created by a live
+/// <c>CredentialRevoked</c> event self-evict on the credential's own expiry. Note that entries
+/// hydrated <em>here</em> cannot: this contract yields ids without expiry, so a boot-hydrated
+/// revocation is retained until the next restart. That is deliberate — over-retention is safe,
+/// under-revocation is not — and it is why the set wants pruning at the source.
+/// </para>
 /// </remarks>
 public interface IRevokedCredentialProvider {
 

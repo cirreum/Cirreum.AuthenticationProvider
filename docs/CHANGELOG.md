@@ -8,6 +8,17 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+- `IRevokedCredentialProvider` now documents the operational constraint that was previously only
+  implicit: **keep the persisted revoked set bounded.** Everything it yields is held in memory for
+  the process lifetime, and the in-memory denylist is capacity-bounded — on saturation it *fails
+  authentication closed* rather than silently dropping a revocation, so an unbounded set degrades
+  into refused authentication rather than stale state. Records the safe pruning rule (remove once
+  the credential could not authenticate anyway; never prune a live, non-expired credential's
+  revocation) and why boot-hydrated entries cannot self-evict the way event-driven ones do.
+  Documentation only — no behavior change.
+
 ### Removed
 
 - **`AuthenticationDiagnostics`** — a public static class whose sole member,

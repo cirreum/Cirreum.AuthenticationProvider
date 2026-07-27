@@ -22,6 +22,7 @@ upgrade, a coordinated multi-repo rollout).
 ### Enrich `IRevokedCredentialProvider` for denylist hygiene
 
 - **SemVer:** Major
+- **Status note (2026-07-26):** the doc-only half shipped in 2.0.0. What remains is the contract change alone, and it was *not* folded into the Kernel 2.0.0 foundation major despite that being a listed trigger — the record shape is still open (`possibly credential-type`), and it cascades to `Cirreum.Authentication.ApiKey` and `.SignedRequest` hydrators plus every app implementing the interface. Current behavior is safe: over-retention, never under-revocation, self-limiting via re-hydration each boot.
 - **Trigger:** Boot-hydrated revocation memory becomes a real concern (very large or long-lived
   revoked-credential populations), or the hydrated denylist needs to evict expired entries without a
   restart — or a coordinated foundation major bundles the contract change.
@@ -36,7 +37,7 @@ upgrade, a coordinated multi-repo rollout).
   would let the hydrators thread expiry into `IApiKeyDenylist.Revoke(id, expiresAt)` for symmetry with
   the live event path. **Breaking** — changes the public return type of an app-implemented interface —
   hence Major, gated to a foundation major or a real forcing function.
-- **App-side guidance (independent, doc-only / Patch-able now):** document on `IRevokedCredentialProvider`
+- **App-side guidance — SHIPPED in 2.0.0.** Documented on `IRevokedCredentialProvider`: document on `IRevokedCredentialProvider`
   that apps must keep their persisted revoked set bounded so the in-memory denylist (capacity-bounded;
   fails auth closed on saturation) does not fill up. Safe pruning rule = the same as the denylist's own
   eviction: remove a revocation once the credential can no longer authenticate anyway — past its own
