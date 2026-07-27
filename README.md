@@ -2,6 +2,7 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/Cirreum.AuthenticationProvider.svg?style=flat-square&labelColor=1F1F1F&color=003D8F)](https://www.nuget.org/packages/Cirreum.AuthenticationProvider/)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Cirreum.AuthenticationProvider.svg?style=flat-square&labelColor=1F1F1F&color=003D8F)](https://www.nuget.org/packages/Cirreum.AuthenticationProvider/)
+[![GitHub Release](https://img.shields.io/github/v/release/cirreum/Cirreum.AuthenticationProvider?style=flat-square&labelColor=1F1F1F&color=FF3B2E)](https://github.com/cirreum/Cirreum.AuthenticationProvider/releases)
 [![License](https://img.shields.io/badge/license-MIT-F2F2F2?style=flat-square&labelColor=1F1F1F)](https://github.com/cirreum/Cirreum.AuthenticationProvider/blob/main/LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10.0-003D8F?style=flat-square&labelColor=1F1F1F)](https://dotnet.microsoft.com/)
 
@@ -9,7 +10,7 @@
 
 ## Overview
 
-`Cirreum.AuthenticationProvider` is the abstraction layer for Cirreum's Authentication pillar (one of the three-pillar separation: Identity / Authentication / Authorization). It defines the contracts that:
+`Cirreum.AuthenticationProvider` is the abstraction layer for Cirreum's Authentication track — one of the three that separate concerns across identity: Identity, Authentication, and Authorization. It defines the contracts that:
 
 - **Scheme packages** implement — `Cirreum.Authentication.ApiKey`, `Cirreum.Authentication.SignedRequest`, `Cirreum.Authentication.SessionTicket`, etc.
 - **Runtime composition** wires — `Cirreum.Runtime.AuthenticationProvider` (the dynamic forward scheme resolver, auth-event hosted handlers, cache invalidators, boot-time analyzers)
