@@ -21,8 +21,8 @@
 			impl packages (ApiKey, SignedRequest, SessionTicket) and runtime composition
 			consume this assumption uniformly.
 		-->
-		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel 2.0.0). -->
-		<PackageReference Include="Cirreum.Contracts" Version="4.0.0" />
+		<!-- Cirreum.Kernel flows in transitively via Cirreum.Contracts (Contracts -> Kernel). -->
+		<PackageReference Include="Cirreum.Contracts" Version="4.0.1" />
 
 		<!-- Provider infrastructure: registrar base contracts + ProviderType.Authentication=9 (1.2.0+) -->
 		<PackageReference Include="Cirreum.Providers" Version="1.3.0" />
