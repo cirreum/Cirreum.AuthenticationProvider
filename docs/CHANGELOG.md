@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-07-31
+
 ### Updated
 
 - Re-pinned `Cirreum.Contracts` `2.0.0` → `4.0.0`, converging on the current major (this repo
