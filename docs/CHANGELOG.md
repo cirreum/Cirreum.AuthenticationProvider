@@ -8,6 +8,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Updated
+
+- Re-pinned `Cirreum.Contracts` `2.0.0` → `4.0.0`, converging on the current major (this repo
+  had been skipped by the 3.0.0 and 4.0.0 repin waves; no consumed surface changed).
+
 ## [2.0.1] - 2026-07-29
 
 ### Updated
