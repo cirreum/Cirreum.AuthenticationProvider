@@ -8,6 +8,67 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+- **`IAuthenticationBuilder` gains the registration funnel.** Two members make registering a
+  scheme and declaring what it authenticates one act:
+  - `DeclareScheme(scheme, subjectKind, profile, roles)` — contributes the scheme's
+    `SchemeClaimAuthorityRegistration` for the map the runtime aggregates at composition close.
+    Used beside scheme registrations an external verb performs (`AddJwtBearer`,
+    `AddOpenIdConnect`, `AddCookie`, `AddMicrosoftIdentityWebApi`).
+  - `AddScheme<TOptions, THandler>(scheme, subjectKind, profile, roles, configureOptions)` —
+    registers the ASP.NET handler scheme *and* contributes the declaration. The Cirreum
+    composition surface cannot register a scheme undeclared; registering through `AuthBuilder`
+    directly is the visible, deliberate exemption.
+
+  New abstract members on a shipped interface are breaking for implementers; the framework's
+  one implementer (`CirreumAuthenticationBuilder`) updates in the same wave. Part of the
+  pre-adoption reshape below.
+- **`AudienceAuthenticationProviderRegistrar` declares in `RegisterScheme`.** Every audience
+  instance now contributes its declaration — the registrar's `SubjectKind` plus the instance's
+  `ClaimAuthority` block — beside its `AudienceSchemeRegistration`, at the same moment the
+  scheme registration is dispatched.
+
+### Changed
+
+- **The registrar contract consolidates onto `IAuthenticationBuilder`.** Breaking on paper and
+  shipped as a patch deliberately: a post-release, pre-adoption reshape (no released package
+  consumes 3.0.0 — all six providers are held), released with `-AllowBreakingPatch`. The builder
+  carries everything the old parameter triple did (`Services`, `Configuration`, `AuthBuilder`).
+  Find/replace for registrar implementations:
+
+  | Before | After |
+  |---|---|
+  | `Register(TSettings, IServiceCollection, IConfiguration, AuthenticationBuilder)` | `Register(TSettings, IAuthenticationBuilder)` |
+  | `RegisterInstance(string, TInstanceSettings, IServiceCollection, IConfiguration, AuthenticationBuilder)` | `RegisterInstance(string, TInstanceSettings, IAuthenticationBuilder)` |
+  | `RegisterScheme(string, TInstanceSettings, IServiceCollection, IConfiguration, AuthenticationBuilder)` | `RegisterScheme(string, TInstanceSettings, IAuthenticationBuilder)` |
+  | `AddAuthenticationHandler(string, TInstanceSettings, IServiceCollection, IConfiguration, AuthenticationBuilder)` | `AddAuthenticationHandler(string, TInstanceSettings, IAuthenticationBuilder)` |
+  | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
+  | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
+
+- **`RegisterInstance` no longer contributes `SchemeClaimAuthorityRegistration`.** The 3.0.0
+  contribution was keyed on the instance key, which is not the scheme name for multi-transport
+  providers (`ApiKey:{transport}`) — a record no lookup would ever find. The declaration now
+  anchors where the scheme is actually registered: the audience base for audience providers,
+  each provider's own registration path otherwise.
+
+### Removed
+
+- **`AuthenticationSchemes.ApiKey`, `.SessionTicket`, `.SignedRequest`, and
+  `.AnonymousPendingAuth`.** The first two named schemes that no longer exist (real names:
+  `ApiKey:Bearer` / `ApiKey:{header}`, `SessionTicket:Bearer`), the third duplicated
+  `SignedRequestSchemes.Default`, and the fourth named a scheme that was never registered.
+  Zero consumers verified framework-wide. The class now holds only the schemes the umbrella
+  itself registers (`Dynamic`, `Ambiguous`, `Anonymous`); provider scheme names are owned by
+  their provider packages (`ApiKeySchemes`, `SessionTicketSchemes`, `SignedRequestSchemes`).
+- **`AllowPendingAuthAttribute`.** Shipped in 1.0.0 as a marker and never consumed — no
+  pipeline code exempted decorated endpoints, and the boot-time pairing validation its docs
+  described was never built. The anonymous-pending-auth *flow* is unaffected: it is carried by
+  endpoint-level anonymous access, per-invocation default-deny operation authorization, and
+  `connection.Promote(...)`, none of which read the attribute. A future revival gets real
+  enforcement designed against `IUserState.SubjectKind`, where the pending window is
+  `SubjectKind.Unknown` with no origin scheme stamped.
+
 ## [3.0.0] - 2026-08-16
 
 ### Updated

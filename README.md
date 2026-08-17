@@ -10,42 +10,53 @@
 
 ## Overview
 
-`Cirreum.AuthenticationProvider` is the abstraction layer for Cirreum's Authentication track — one of the three that separate concerns across identity: Identity, Authentication, and Authorization. It defines the contracts that:
+`Cirreum.AuthenticationProvider` provides the shared contracts for Cirreum authentication providers.
 
-- **Scheme packages** implement — `Cirreum.Authentication.ApiKey`, `Cirreum.Authentication.SignedRequest`, `Cirreum.Authentication.SessionTicket`, etc.
-- **Runtime composition** wires — `Cirreum.Runtime.AuthenticationProvider` (the dynamic forward scheme resolver, auth-event hosted handlers, cache invalidators, boot-time analyzers)
-- **The umbrella package** exposes — `Cirreum.Runtime.Authentication` (the `AddAuthentication(...)` app-facing builder)
+It sits between individual authentication scheme packages and the runtime that composes them:
 
-### Contract surface
+- **Scheme packages** implement these contracts — `Cirreum.Authentication.ApiKey`,
+  `Cirreum.Authentication.SignedRequest`, `Cirreum.Authentication.SessionTicket`, etc.
+- **Runtime composition** consumes them — `Cirreum.Runtime.AuthenticationProvider`
+- **Applications** access them through — `Cirreum.Runtime.Authentication`
 
-**Registrars** — the base every scheme package derives from:
-- `AuthenticationProviderRegistrar<TSettings, TInstanceSettings>` — per-instance registration, scheme-name derivation (the instance key **is** the scheme name), and instance-key deduplication
-- `HeaderAuthenticationProviderRegistrar<,>` / `AudienceAuthenticationProviderRegistrar<,>` — the host-type-sensitivity split, by credential transport
-- `ProviderName` and `SubjectKind` — the two constants a provider declares. `SubjectKind` states whether the provider authenticates people or machines, so nothing downstream has to infer it from a token's contents
+## Contract surface
 
-**Schemes:**
-- `ISchemeSelector` + `SchemeCategory` enum — per-request scheme dispatch (open/closed)
-- `CredentialTransport` enum — where the scheme reads its credential
-- `ISignedRequestAlgorithm` + resolver — version-pluggable crypto for SignedRequest scheme
-- `SessionTicket` family — HTTP→long-lived-connection handoff primitives
+### Provider registration
 
-**Settings:**
-- `AuthenticationProviderSettings<TInstanceSettings>` / `AuthenticationProviderInstanceSettings` — the configuration bases bound from `Cirreum:Authentication:Providers:{ProviderName}`
-- `ClaimAuthoritySettings` — the optional per-instance `ClaimAuthority` block declaring who owns a scheme's callers, the identity provider or the application's own store, separately for `Profile` and `Roles`
+- `AuthenticationProviderRegistrar<TSettings, TInstanceSettings>` — base registrar for
+  provider instances, scheme naming, and instance deduplication
+- `HeaderAuthenticationProviderRegistrar<,>` / `AudienceAuthenticationProviderRegistrar<,>` —
+  registrar specializations by credential routing model
+- `ProviderName` and `SubjectKind` — provider identity and authenticated subject classification
 
-**Patterns:**
-- `IAuthenticationBuilder` — the builder surface scheme registrations extend
-- `[AllowPendingAuth]` — opt-in for Two-Phase Auth's anonymous-pending-auth pattern
+### Scheme contracts
 
-**Compositions:**
-- `AudienceSchemeRegistration` — the audience → scheme routing contribution audience-based registrars add per instance
-- `SchemeClaimAuthorityRegistration` — the claim-authority declaration contributed per registered scheme, aggregated by the runtime
-- `IRevokedCredentialProvider` — app-side credential revocation hydration
-- `ConfigureCoordination(...)` / `AddDefaultCoordinationScope()` — auth-track conveniences over the neutral `Cirreum.Coordination` primitive, letting the backend be chosen inside the composition callback and defaulting the scope to `{app}:{env}`
+- `ISchemeSelector` / `SchemeCategory` — per-request authentication scheme selection
+- `CredentialTransport` — identifies where a scheme receives its credential
+- `ISignedRequestAlgorithm` and resolver — pluggable SignedRequest algorithms
+- `SessionTicket` contracts — HTTP-to-long-lived-connection authentication handoff
 
-Profile enrichment (`IUserProfileEnrichmentBuilder`, `IGraphEnabledBuilder`, `IExternalGraphEnabledBuilder`, `ClaimsUserProfileEnricher`) is **not** part of this package — it's host-agnostic (any host may enrich a profile post-authentication, regardless of which — or whether any — auth scheme is active) and lives in `Cirreum.Contracts`/`Cirreum.Domain` instead. The same reasoning applies to authentication-boundary resolution (`IAuthenticationBoundaryResolver`, `AuthenticationBoundary`): the server user-state pipeline consumes it whether or not any authentication scheme is composed, so it lives in `Cirreum.Kernel`.
+### Configuration
 
-Attribute authority splits along the same line. The *vocabulary* — `SubjectKind`, `ClaimAuthority`, `SchemeClaimAuthority`, `ISchemeClaimAuthorityMap` — lives in `Cirreum.Kernel`, because operation authorizers read the resolved answer off `IUserState` and sit below this package. What lives here is the **declaring**: the registrar constant, the settings block, and the per-scheme contribution that carries them into composition.
+- `AuthenticationProviderSettings<TInstanceSettings>` /
+  `HeaderAuthenticationProviderInstanceSettings`, `AudienceAuthenticationProviderInstanceSettings` — base provider configuration bound from
+  `Cirreum:Authentication:Providers:{ProviderName}`
+- `ClaimAuthoritySettings` — declares whether profile and role claims are authoritative
+  from the identity provider or application store
+
+### Composition
+
+- `IAuthenticationBuilder` — builder surface used by scheme packages to register and
+  declare authentication schemes
+- `AudienceSchemeRegistration` — audience-to-scheme routing metadata
+- `SchemeClaimAuthorityRegistration` — per-scheme claim-authority metadata
+- `IRevokedCredentialProvider` — application-provided credential revocation state
+- `ConfigureCoordination(...)` / `AddDefaultCoordinationScope()` — authentication-specific
+  coordination helpers
+
+This package contains authentication-provider composition contracts only. Host-independent
+identity/profile enrichment and authorization primitives live in lower-level Cirreum packages.
+
 
 ## Where it fits
 

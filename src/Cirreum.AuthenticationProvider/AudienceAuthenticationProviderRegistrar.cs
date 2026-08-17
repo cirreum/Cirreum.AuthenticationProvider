@@ -2,7 +2,6 @@ namespace Cirreum.AuthenticationProvider;
 
 using Cirreum.AuthenticationProvider.Configuration;
 using Cirreum.Providers;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,9 +34,7 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 	protected override void RegisterScheme(
 		string key,
 		TInstanceSettings settings,
-		IServiceCollection services,
-		IConfiguration configuration,
-		AuthenticationBuilder authBuilder) {
+		IAuthenticationBuilder builder) {
 
 		if (string.IsNullOrWhiteSpace(settings.Audience)) {
 			throw new InvalidOperationException(
@@ -49,17 +46,28 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 		// container at construction; the umbrella validates it at composition close.
 		// Every audience-based scheme picks this up through the base — no per-scheme
 		// wiring required.
-		services.AddSingleton(new AudienceSchemeRegistration(
+		builder.Services.AddSingleton(new AudienceSchemeRegistration(
 			settings.Audience,
 			settings.Scheme,
 			this.ProviderName));
 
-		var instanceSection = configuration.GetSection(this.GetInstanceSectionPath(key));
+		// Declare what this scheme authenticates and who owns its callers' claims —
+		// anchored on the registered scheme, contributed at the same moment the scheme
+		// registration is dispatched. The scheme's actual registration happens inside
+		// an external verb (AddJwtBearer / AddMicrosoftIdentityWebApi / ...), so the
+		// declare-only form is the correct half of the one-act rule here.
+		builder.DeclareScheme(
+			settings.Scheme,
+			this.SubjectKind,
+			settings.ClaimAuthority.Profile,
+			settings.ClaimAuthority.Roles);
+
+		var instanceSection = builder.Configuration.GetSection(this.GetInstanceSectionPath(key));
 
 		if (ProviderContext.GetRuntimeType() == ProviderRuntimeType.WebApp) {
-			this.AddAuthenticationForWebApp(instanceSection, settings, authBuilder);
+			this.AddAuthenticationForWebApp(instanceSection, settings, builder);
 		} else {
-			this.AddAuthenticationForWebApi(instanceSection, settings, authBuilder);
+			this.AddAuthenticationForWebApi(instanceSection, settings, builder);
 		}
 	}
 
@@ -70,7 +78,7 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 	public abstract void AddAuthenticationForWebApi(
 		IConfigurationSection instanceSection,
 		TInstanceSettings providerSettings,
-		AuthenticationBuilder authBuilder);
+		IAuthenticationBuilder builder);
 
 	/// <summary>
 	/// Adds the authentication scheme configuration for Web App applications
@@ -79,6 +87,6 @@ public abstract class AudienceAuthenticationProviderRegistrar<TSettings, TInstan
 	public abstract void AddAuthenticationForWebApp(
 		IConfigurationSection instanceSection,
 		TInstanceSettings providerSettings,
-		AuthenticationBuilder authBuilder);
+		IAuthenticationBuilder builder);
 
 }

@@ -3,8 +3,6 @@ namespace Cirreum.AuthenticationProvider;
 using Cirreum.AuthenticationProvider.Configuration;
 using Cirreum.Providers;
 using Cirreum.Security;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
@@ -30,7 +28,7 @@ using Microsoft.Extensions.DependencyInjection;
 /// via explicit typed calls to the runtime's <c>RegisterAuthenticationProvider&lt;TRegistrar,
 /// TSettings, TInstance&gt;(...)</c> extension method — that helper reads this
 /// provider's configuration section, binds to <typeparamref name="TSettings"/>, and
-/// calls <see cref="Register(TSettings, IServiceCollection, IConfiguration, AuthenticationBuilder)"/>.
+/// calls <see cref="Register(TSettings, IAuthenticationBuilder)"/>.
 /// Apps that add custom schemes call the same typed extension method themselves.
 /// </para>
 /// </remarks>
@@ -70,9 +68,7 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 	/// </summary>
 	public virtual void Register(
 		TSettings providerSettings,
-		IServiceCollection services,
-		IConfiguration configuration,
-		AuthenticationBuilder authBuilder) {
+		IAuthenticationBuilder builder) {
 
 		if (providerSettings is null || providerSettings.Instances.Count == 0) {
 			return;
@@ -83,7 +79,7 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 				continue;
 			}
 
-			this.RegisterInstance(key, settings, services, configuration, authBuilder);
+			this.RegisterInstance(key, settings, builder);
 		}
 	}
 
@@ -95,19 +91,17 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 	public virtual void RegisterInstance(
 		string key,
 		TInstanceSettings settings,
-		IServiceCollection services,
-		IConfiguration configuration,
-		AuthenticationBuilder authBuilder) {
+		IAuthenticationBuilder builder) {
 
 		// Duplicate-registration guard, scoped to this service collection — state lives
 		// in the composition, not the process, so multiple hosts in one process are
 		// fully isolated.
 		var providerRegistrationKey = $"Cirreum.{this.ProviderType}.{this.ProviderName}::{key}";
-		if (services.Any(d => d.ImplementationInstance is ProcessedInstanceKey processed
+		if (builder.Services.Any(d => d.ImplementationInstance is ProcessedInstanceKey processed
 			&& processed.Value == providerRegistrationKey)) {
 			throw new InvalidOperationException($"A service with the key of '{key}' has already been registered.");
 		}
-		services.AddSingleton(new ProcessedInstanceKey(providerRegistrationKey));
+		builder.Services.AddSingleton(new ProcessedInstanceKey(providerRegistrationKey));
 
 		if (settings is null) {
 			throw new InvalidOperationException($"Missing required settings for the service '{key}'");
@@ -126,18 +120,7 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 
 		this.ValidateSettings(settings);
 
-		// Publish what this scheme declares, for the map the runtime builds at composition close.
-		// Anchored on the registered scheme, not the configured instance: a provider whose
-		// credentials resolve dynamically can register a scheme with no configured instances at
-		// all, and contributes from its own composition verb instead. After validation, so an
-		// instance that fails declares nothing.
-		services.AddSingleton(new SchemeClaimAuthorityRegistration(
-			key,
-			this.SubjectKind,
-			settings.ClaimAuthority.Profile,
-			settings.ClaimAuthority.Roles));
-
-		this.RegisterScheme(key, settings, services, configuration, authBuilder);
+		this.RegisterScheme(key, settings, builder);
 	}
 
 	/// <summary>
@@ -148,14 +131,16 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 		$"Cirreum:{this.ProviderType}:Providers:{this.ProviderName}:Instances:{instanceKey}";
 
 	/// <summary>
-	/// Registers the ASP.NET Core authentication scheme for this instance. Derived
-	/// classes implement this to handle audience-based or header-based registration.
+	/// Registers the ASP.NET Core authentication scheme(s) for this instance and declares
+	/// them through the builder: route through
+	/// <see cref="IAuthenticationBuilder.AddScheme{TOptions, THandler}"/>, or pair an
+	/// external registration verb with
+	/// <see cref="IAuthenticationBuilder.DeclareScheme"/>. Every scheme this method
+	/// registers must also be declared.
 	/// </summary>
 	protected abstract void RegisterScheme(
 		string key,
 		TInstanceSettings settings,
-		IServiceCollection services,
-		IConfiguration configuration,
-		AuthenticationBuilder authBuilder);
+		IAuthenticationBuilder builder);
 
 }

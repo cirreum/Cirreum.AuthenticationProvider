@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<AssemblyName>Cirreum.AuthenticationProvider</AssemblyName>
 		<RootNamespace>Cirreum</RootNamespace>
-		<Description>Authentication track abstractions for the Cirreum framework (three-pillar separation and composition surface). Defines the contracts scheme packages (ApiKey, SignedRequest, SessionTicket) implement: ISchemeSelector + SchemeCategory, CredentialTransport, ISignedRequestAlgorithm + resolver, SessionTicket primitives, [AllowPendingAuth], IAuthenticationBoundaryResolver, IAuthenticationBuilder. Pure abstractions plus a default impl (DefaultAuthenticationBoundaryResolver) that ships with the contracts. Host-agnostic profile enrichment (IUserProfileEnrichmentBuilder, ClaimsUserProfileEnricher) lives in Cirreum.Contracts/Cirreum.Domain, not here.</Description>
+		<Description>Authentication track abstractions for the Cirreum framework (three-pillar separation and composition surface). Defines the contracts scheme packages (ApiKey, SignedRequest, SessionTicket) implement: ISchemeSelector + SchemeCategory, CredentialTransport, ISignedRequestAlgorithm + resolver, SessionTicket primitives, IAuthenticationBoundaryResolver, IAuthenticationBuilder (whose DeclareScheme / AddScheme pair scheme registration with its claim-authority declaration). Pure abstractions plus a default impl (DefaultAuthenticationBoundaryResolver) that ships with the contracts. Host-agnostic profile enrichment (IUserProfileEnrichmentBuilder, ClaimsUserProfileEnricher) lives in Cirreum.Contracts/Cirreum.Domain, not here.</Description>
 		<PackageTags>cirreum;authentication;provider;abstractions;framework</PackageTags>
 	</PropertyGroup>
 

@@ -1,28 +1,19 @@
 namespace Cirreum.AuthenticationProvider;
 
 /// <summary>
-/// A revoked credential as reported by an <see cref="IRevokedCredentialProvider"/> — the identifier,
-/// and when the credential expires on its own.
+/// Describes a credential that has been revoked.
 /// </summary>
 /// <param name="CredentialId">
-/// The credential identifier. Scheme-specific in shape (API key id, JWT <c>jti</c>, keypair
-/// fingerprint) and must be the exact value the runtime consumer indexes credentials by.
+/// The exact credential identifier used by the authentication scheme for lookup and revocation matching.
 /// </param>
 /// <param name="ExpiresAt">
-/// When the credential expires by its own terms, or <see langword="null"/> when it does not expire —
-/// or when the application cannot determine it.
-/// <para>
-/// This is the credential's expiry, <b>not</b> the revocation's. A revocation never expires early;
-/// carrying the credential's expiry simply lets the in-memory denylist drop an entry once the
-/// credential could no longer authenticate anyway, rather than retaining it until the process
-/// restarts. <see langword="null"/> means "retain until restart" — safe, because over-retention only
-/// costs memory while under-revocation would re-admit a revoked credential.
-/// </para>
+/// The credential's expiration time, or <see langword="null"/> if the credential does not expire
+/// or its expiration is unknown.
 /// </param>
 /// <remarks>
-/// A <see langword="readonly record struct" /> rather than a class: this streams through
-/// <see cref="IAsyncEnumerable{T}"/> on the boot path, and the populations that motivate carrying
-/// expiry at all are the large ones — where an allocation per revocation is the cost worth avoiding.
+/// <see cref="ExpiresAt"/> represents the credential's own expiration, not the expiration of the
+/// revocation. When supplied, it allows the framework to discard the revocation after the
+/// credential can no longer authenticate.
 /// </remarks>
 public readonly record struct RevokedCredential(
 	string CredentialId,

@@ -1,47 +1,17 @@
 namespace Cirreum.AuthenticationProvider;
 
 /// <summary>
-/// Well-known authentication scheme names registered by Cirreum's scheme
-/// implementations and consumed by the dynamic forward resolver, app composition,
-/// and audit code paths.
+/// Scheme names for the framework-shipped schemes the umbrella composition itself
+/// registers (implemented in <c>Cirreum.Runtime.AuthenticationProvider</c>, composed by
+/// <c>Cirreum.Runtime.Authentication</c>).
 /// </summary>
 /// <remarks>
-/// Scheme names are stable string constants centralized here to prevent
-/// drift between registration and consumption. Scheme packages reference
-/// these constants when calling <c>AddAuthentication().AddScheme(...)</c>; app code
-/// references them in <c>[Authorize(AuthenticationSchemes = ...)]</c> attributes when
-/// pinning specific schemes is desired.
+/// This class holds only the schemes the framework spine owns. Provider scheme names are
+/// owned by the packages that register them — pin a provider scheme from that package's
+/// own constants (<c>ApiKeySchemes</c>, <c>SessionTicketSchemes</c>,
+/// <c>SignedRequestSchemes</c>), never from a name restated here.
 /// </remarks>
 public static class AuthenticationSchemes {
-
-	/// <summary>
-	/// ApiKey scheme — header/Bearer transport for M2M credentials.
-	/// Implemented in <c>Cirreum.Authentication.ApiKey</c>.
-	/// </summary>
-	public const string ApiKey = "ApiKey";
-
-	/// <summary>
-	/// SignedRequest scheme — RFC 9421-aligned HTTP message signatures for M2M
-	/// credentials with key-pair authentication.
-	/// Implemented in <c>Cirreum.Authentication.SignedRequest</c>.
-	/// </summary>
-	public const string SignedRequest = "SignedRequest";
-
-	/// <summary>
-	/// SessionTicket scheme — bridges HTTP-authenticated callers to long-lived
-	/// connection establishment (WebSocket, SignalR, gRPC streaming).
-	/// Implemented in <c>Cirreum.Authentication.SessionTicket</c>.
-	/// </summary>
-	public const string SessionTicket = "SessionTicket";
-
-	/// <summary>
-	/// Anonymous-pending-auth pseudo-scheme — accepts unauthenticated callers on
-	/// endpoints marked with <see cref="AllowPendingAuthAttribute"/>.
-	/// </summary>
-	public const string AnonymousPendingAuth = "AnonymousPendingAuth";
-
-	// Framework-shipped schemes (implemented in Cirreum.Runtime.AuthenticationProvider).
-	// Apps reference these constants in [Authorize(AuthenticationSchemes = ...)] when pinning.
 
 	/// <summary>
 	/// Dynamic forward scheme — ASP.NET <c>PolicyScheme</c> that iterates registered
