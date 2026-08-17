@@ -19,33 +19,6 @@ upgrade, a coordinated multi-repo rollout).
 
 ## Queued
 
-### The `CoordinationScope` default is duplicated across two packages
-
-**SemVer:** Minor
-**Trigger:** the attribute-authority wave, which touches this package for the claim-authority declaration; or any change to how the canonical `{app}:{env}` scope is derived.
-**Noted:** 2026-08-16
-
-`ConfigureCoordination` here and `AddEventCoordination` in `Cirreum.Runtime.Authentication` both
-call `services.AddCoordination(...)` and then register the same default scope with a verbatim
-copy of the same block — identical `TryAddSingleton`, identical lambda, identical exception
-message. Two definitions of one rule, across a layer boundary, where a change to either is
-invisible from the other.
-
-The duplication is *almost* deliberate and should not be resolved the obvious way. The scope is
-intentionally opaque to `Cirreum.Coordination`: it holds no opinion about application or
-environment naming, and composition surfaces that know `IDomainEnvironment` supply the default.
-Pushing the block down into `AddCoordination` would collapse that separation, and the neutral
-primitive would start knowing what an application is.
-
-The resolution consistent with that design is a shared helper *here* — one composition surface
-owning the default, with the Runtime Extensions verb calling it rather than restating it. This
-package is the right home: it is the lowest layer where the auth track's coordination
-conveniences live, and Runtime Extensions sits above it.
-
-Worth doing when this package is next opened. The failure mode if left is quiet: the two copies
-drift, and an application's coordination state silently lands under a different scope depending
-on which verb it happened to call.
-
 ### The host-shape branch in `AudienceAuthenticationProviderRegistrar` is untestable in-process
 
 **SemVer:** Unspecified

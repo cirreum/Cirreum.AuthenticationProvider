@@ -35,6 +35,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
   arriving thin. Omitting the block declares nothing and preserves existing behavior: roles come
   from the application store when a resolver is registered for the scheme, and from the identity
   provider otherwise.
+- **`AddDefaultCoordinationScope()`** — registers the canonical `{app}:{env}` coordination scope,
+  extracted from `ConfigureCoordination` so it has one definition. `AddEventCoordination` in
+  `Cirreum.Runtime.Authentication` carried a verbatim copy — identical registration, identical
+  exception text — and can now call this instead. The scope stays deliberately opaque to
+  `Cirreum.Coordination`, which holds no opinion about what an application or environment is;
+  supplying the default belongs to a composition surface that knows `IDomainEnvironment`, and
+  this is that surface.
 - **Per-scheme declaration published at composition.** `RegisterInstance` contributes a
   `SchemeClaimAuthorityRegistration` for each registered scheme, after validation so a failing
   instance declares nothing. The runtime aggregates these into the map its claims transformation

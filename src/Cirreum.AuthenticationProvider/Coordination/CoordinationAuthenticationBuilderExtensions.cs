@@ -3,7 +3,6 @@ namespace Cirreum.Authentication;
 using Cirreum.AuthenticationProvider;
 using Cirreum.Coordination;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 /// <summary>
 /// Auth-track convenience over the neutral <c>Cirreum.Coordination</c> primitive: exposes
@@ -40,17 +39,7 @@ public static class CoordinationAuthenticationBuilderExtensions {
 		ArgumentNullException.ThrowIfNull(configure);
 
 		builder.Services.AddCoordination(configure);
-
-		// Default the coordination scope to the canonical {app}:{env}. TryAdd, and
-		// WithScope(...) uses Replace — so an explicit scope wins in any order.
-		builder.Services.TryAddSingleton(static sp => {
-			var environment = sp.GetService<IDomainEnvironment>()
-				?? throw new InvalidOperationException(
-					"The default CoordinationScope derives {app}:{env} from IDomainEnvironment, " +
-					"which is not registered. Host via DomainApplication.CreateBuilder, or register " +
-					"an explicit scope: auth.ConfigureCoordination(c => c.WithScope(...)).");
-			return CoordinationScope.For(environment.ApplicationName, environment.EnvironmentName);
-		});
+		builder.Services.AddDefaultCoordinationScope();
 
 		return builder;
 	}

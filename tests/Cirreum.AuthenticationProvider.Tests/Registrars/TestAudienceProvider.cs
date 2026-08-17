@@ -2,6 +2,7 @@ namespace Cirreum.AuthenticationProvider.Tests.Registrars;
 
 using Cirreum.AuthenticationProvider;
 using Cirreum.AuthenticationProvider.Configuration;
+using Cirreum.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
 
@@ -19,6 +20,10 @@ internal sealed class TestAudienceSettings : AuthenticationProviderSettings<Test
 internal sealed class TestAudienceRegistrar : AudienceAuthenticationProviderRegistrar<TestAudienceSettings, TestAudienceInstanceSettings> {
 
 	public override string ProviderName => "TestAudience";
+
+	// Audience-based schemes validate JWTs issued to people. The declaration is per provider,
+	// so the instance-key and scheme-derivation tests below all inherit it.
+	public override SubjectKind SubjectKind => SubjectKind.Human;
 
 	public List<string> WebApiSchemes { get; } = [];
 
