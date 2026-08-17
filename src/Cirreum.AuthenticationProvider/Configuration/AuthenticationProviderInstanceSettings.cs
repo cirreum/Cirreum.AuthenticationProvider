@@ -46,6 +46,17 @@ public abstract class AuthenticationProviderInstanceSettings
 	public bool Enabled { get; set; }
 
 	/// <summary>
+	/// Gets or sets which side owns this scheme's callers — the identity provider, or the
+	/// application's own store — per class of attribute.
+	/// </summary>
+	/// <remarks>
+	/// Optional. An instance that omits the block declares nothing and keeps existing behavior;
+	/// see <see cref="ClaimAuthoritySettings"/> for what each axis means and why roles and profile
+	/// are answered separately.
+	/// </remarks>
+	public ClaimAuthoritySettings ClaimAuthority { get; set; } = new();
+
+	/// <summary>
 	/// Gets or sets the raw <see cref="IConfigurationSection"/> used to pass
 	/// provider-specific configuration to the authentication builder. This section
 	/// contains the detailed configuration for this instance.

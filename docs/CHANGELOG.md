@@ -8,6 +8,34 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Breaking
+
+- **`AuthenticationProviderRegistrar<,>` gains an abstract `SubjectKind`.** Every registrar now
+  declares whether it authenticates people or machines. Framework-shipped registrars answer it in
+  the same wave; an application with its own custom registrar must add one line
+  (`public override SubjectKind SubjectKind => SubjectKind.Human;` for a scheme carrying real
+  users). Abstract rather than defaulted on purpose: a provider that never answers is one whose
+  callers cannot be classified, and that belongs at compile time rather than surfacing as an
+  unexplained `Unknown` in production. Answer it from what the provider authenticates, never from
+  its transport — header-based does not imply machine, since session tickets carry people.
+
+### Added
+
+- **`ClaimAuthoritySettings` on every authentication instance, as an optional `ClaimAuthority`
+  block.** Declares which side owns a scheme's callers — the identity provider or the
+  application's own store — separately for `Profile` and `Roles`, because the two genuinely
+  differ: an identity provider federating an external account may supply the profile while the
+  application still owns the roles. Each is a *precedence* rule, not exclusivity — the declared
+  side wins where both supply a value, and neither is blocked from supplying one, which is what
+  lets one scheme serve both a federated account carrying full claims and a local account
+  arriving thin. Omitting the block declares nothing and preserves existing behavior: roles come
+  from the application store when a resolver is registered for the scheme, and from the identity
+  provider otherwise.
+- **Per-scheme declaration published at composition.** `RegisterInstance` contributes a
+  `SchemeClaimAuthorityRegistration` for each registered scheme, after validation so a failing
+  instance declares nothing. The runtime aggregates these into the map its claims transformation
+  and user-state accessor read, replacing three separate inferences drawn from token contents.
+
 ## [2.0.5] - 2026-08-04
 
 ### Updated
