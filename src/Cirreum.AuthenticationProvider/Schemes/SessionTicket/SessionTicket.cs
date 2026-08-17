@@ -1,70 +1,61 @@
 namespace Cirreum.AuthenticationProvider.SessionTicket;
 
 /// <summary>
-/// A session-establishment credential minted by app code (negotiate endpoints, webhook
-/// handlers) and validated at WebSocket / SignalR / gRPC-streaming handshake. Binds an
-/// authenticated subject to a long-lived connection without re-running the upstream
-/// authentication flow on every reconnect.
+/// Represents a session-establishment credential that binds an authenticated subject
+/// to a long-lived connection.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Tickets are opaque values validated by store lookup via <see cref="ISessionStore"/>,
-/// implemented in <c>Cirreum.Authentication.SessionTicket</c>. The record here is
-/// transport-agnostic — validated tickets surface as <see cref="SessionTicket"/>
-/// regardless of how they were carried.
-/// </para>
-/// <para>
-/// <see cref="Channel"/> and <see cref="Reference"/> are app-defined annotations that
-/// flow into <c>IRequestOrigin</c> on binding. They are <em>not security-relevant</em> —
-/// the authorization pipeline does not branch on them.
-/// </para>
+/// Session tickets are opaque credentials validated through an <see cref="ISessionStore"/>.
+/// <see cref="Channel"/> and <see cref="Reference"/> are application-defined metadata and
+/// are not used for authorization.
 /// </remarks>
 public sealed record SessionTicket {
 
 	/// <summary>
-	/// The opaque ticket value as carried on the wire. The value uniquely identifies the
-	/// ticket; callers must not parse semantics out of it.
+	/// Gets the opaque ticket value used to identify and validate the session ticket.
 	/// </summary>
+	/// <remarks>
+	/// Callers should treat this value as opaque and must not derive semantics from it.
+	/// </remarks>
 	public required string TicketValue { get; init; }
 
 	/// <summary>
-	/// The authenticated subject the ticket is bound to. Populated from the upstream
-	/// authentication that minted the ticket; this is what becomes the connection's
-	/// principal name after binding.
+	/// Gets the authenticated subject associated with the ticket.
 	/// </summary>
 	public required string Subject { get; init; }
 
 	/// <summary>
-	/// The authentication scheme that established <see cref="Subject"/>, or
-	/// <see langword="null"/> when unknown. This is the subject's origin scheme, not the
-	/// ticket's own scheme.
+	/// Gets the authentication scheme that originally authenticated the subject,
+	/// or <see langword="null"/> when unknown.
 	/// </summary>
+	/// <remarks>
+	/// This identifies the subject's originating authentication scheme, not the
+	/// session-ticket authentication scheme.
+	/// </remarks>
 	public string? Scheme { get; init; }
 
 	/// <summary>
-	/// Absolute expiry. Validators reject tickets after this instant; short TTLs
-	/// (minutes, not days) are the v1 hardening posture (no DPoP / sender-constrained
-	/// tokens today).
+	/// Gets the absolute expiration time of the ticket.
 	/// </summary>
 	public required DateTimeOffset ExpiresAt { get; init; }
 
 	/// <summary>
-	/// App-defined channel annotation flowing into <c>IRequestOrigin.Channel</c> on
-	/// binding (e.g., <c>"TwilioIVA"</c>, <c>"WebChat"</c>, <c>"LLMToolCall"</c>).
+	/// Gets application-defined channel metadata associated with the session.
 	/// </summary>
 	public string? Channel { get; init; }
 
 	/// <summary>
-	/// App-defined correlation reference flowing into <c>IRequestOrigin.Reference</c>
-	/// on binding (e.g., call SID, conversation ID).
+	/// Gets an application-defined correlation reference associated with the session.
 	/// </summary>
 	public string? Reference { get; init; }
 
 	/// <summary>
-	/// Additional claims to bind onto the resulting principal. The
-	/// <see cref="ISessionTicketPrincipalBinder"/> implementation decides how these
-	/// map onto the produced <c>ClaimsPrincipal</c>.
+	/// Gets additional claims to bind to the resulting principal.
 	/// </summary>
+	/// <remarks>
+	/// The <see cref="ISessionTicketPrincipalBinder"/> determines how these values
+	/// are represented on the resulting principal.
+	/// </remarks>
 	public IReadOnlyDictionary<string, string>? Claims { get; init; }
 
 }

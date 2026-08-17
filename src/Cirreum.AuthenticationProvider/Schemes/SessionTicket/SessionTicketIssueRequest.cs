@@ -18,8 +18,9 @@ public sealed record SessionTicketIssueRequest {
 	public required string Subject { get; init; }
 
 	/// <summary>
-	/// The authentication scheme that established <see cref="Subject"/> — typically the
-	/// requesting caller's authenticated scheme. Flowed into <c>SessionTicket.Scheme</c>.
+	/// Gets the authentication scheme that originally authenticated <see cref="Subject"/>,
+	/// typically the requesting caller's authenticated scheme. Flowed into
+	/// <c>SessionTicket.Scheme</c>.
 	/// </summary>
 	public string? Scheme { get; init; }
 

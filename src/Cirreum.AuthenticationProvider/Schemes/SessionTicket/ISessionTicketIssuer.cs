@@ -5,10 +5,10 @@ namespace Cirreum.AuthenticationProvider.SessionTicket;
 /// after the upstream authentication has produced an authenticated subject.
 /// </summary>
 /// <remarks>
-/// The implementation in <c>Cirreum.Authentication.SessionTicket</c>
-/// ships opaque-ticket and JWT-ticket variants; apps can register custom issuers for
-/// app-specific ticket shapes. Issuer implementations handle ticket-value generation,
-/// persistence (opaque), signing (JWT), and expiry semantics.
+/// The implementation in <c>Cirreum.Authentication.SessionTicket</c> ships an
+/// opaque-ticket issuer; applications can register custom issuers for app-specific
+/// ticket shapes. Issuer implementations handle ticket-value generation, persistence,
+/// and expiry semantics.
 /// </remarks>
 public interface ISessionTicketIssuer {
 

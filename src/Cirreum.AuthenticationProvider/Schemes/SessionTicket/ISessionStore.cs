@@ -1,10 +1,9 @@
 namespace Cirreum.AuthenticationProvider.SessionTicket;
 
 /// <summary>
-/// Persistence abstraction for session tickets. Used by the opaque-variant
+/// Persistence abstraction for session tickets. Used by the
 /// <see cref="ISessionTicketIssuer"/> and <see cref="ISessionTicketValidator"/>
-/// implementations; the JWT variant may use a no-op or minimal store since validation
-/// is self-contained.
+/// implementations.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -22,8 +21,8 @@ namespace Cirreum.AuthenticationProvider.SessionTicket;
 public interface ISessionStore {
 
 	/// <summary>
-	/// Persists <paramref name="ticket"/>. Called by the opaque-variant issuer at
-	/// issuance time. Implementations are responsible for honoring
+	/// Persists <paramref name="ticket"/>. Called by the issuer at issuance time.
+	/// Implementations are responsible for honoring
 	/// <see cref="SessionTicket.ExpiresAt"/> (e.g., via storage-level TTL).
 	/// </summary>
 	ValueTask StoreAsync(SessionTicket ticket, CancellationToken cancellationToken);
