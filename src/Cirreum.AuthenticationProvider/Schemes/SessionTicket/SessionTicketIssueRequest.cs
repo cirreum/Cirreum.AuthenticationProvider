@@ -18,6 +18,12 @@ public sealed record SessionTicketIssueRequest {
 	public required string Subject { get; init; }
 
 	/// <summary>
+	/// The authentication scheme that established <see cref="Subject"/> — typically the
+	/// requesting caller's authenticated scheme. Flowed into <c>SessionTicket.Scheme</c>.
+	/// </summary>
+	public string? Scheme { get; init; }
+
+	/// <summary>
 	/// How long the ticket should remain valid from issuance. Issuers compute
 	/// <c>SessionTicket.ExpiresAt = now + Lifetime</c>. Short lifetimes are the v1
 	/// posture.

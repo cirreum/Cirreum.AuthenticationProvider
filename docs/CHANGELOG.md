@@ -28,6 +28,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
   instance now contributes its declaration — the registrar's `SubjectKind` plus the instance's
   `ClaimAuthority` block — beside its `AudienceSchemeRegistration`, at the same moment the
   scheme registration is dispatched.
+- **`Scheme` on `SessionTicket` and `SessionTicketIssueRequest`** — the authentication scheme
+  that established the ticket's subject. A session ticket is a continuation; validators stamp
+  this as the origin scheme (`AuthenticationContextKeys.OriginScheme`, Kernel 2.1.1) so the
+  subject's declaration re-resolves from the scheme that authenticated them. Optional — a
+  ticket without an origin resolves `SubjectKind.Unknown`, the fail-safe.
 
 ### Changed
 
@@ -46,6 +51,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
   | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
   | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
 
+- `SessionTicket` record docs no longer describe a JWT variant — dropped from the roadmap; the
+  opaque store-validated ticket is the product.
 - **`RegisterInstance` no longer contributes `SchemeClaimAuthorityRegistration`.** The 3.0.0
   contribution was keyed on the instance key, which is not the scheme name for multi-transport
   providers (`ApiKey:{transport}`) — a record no lookup would ever find. The declaration now

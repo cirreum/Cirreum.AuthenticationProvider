@@ -8,11 +8,10 @@ namespace Cirreum.AuthenticationProvider.SessionTicket;
 /// </summary>
 /// <remarks>
 /// <para>
-/// SessionTicket has two variants implemented in
-/// <c>Cirreum.Authentication.SessionTicket</c>: an opaque variant (random bytes + DB
-/// lookup via <see cref="ISessionStore"/>) and a JWT variant (RFC 7519 / RFC 8725 /
-/// RFC 9068 conventions; self-contained validation). The record here is variant-
-/// agnostic — both variants surface as <see cref="SessionTicket"/> after validation.
+/// Tickets are opaque values validated by store lookup via <see cref="ISessionStore"/>,
+/// implemented in <c>Cirreum.Authentication.SessionTicket</c>. The record here is
+/// transport-agnostic — validated tickets surface as <see cref="SessionTicket"/>
+/// regardless of how they were carried.
 /// </para>
 /// <para>
 /// <see cref="Channel"/> and <see cref="Reference"/> are app-defined annotations that
@@ -35,6 +34,13 @@ public sealed record SessionTicket {
 	/// principal name after binding.
 	/// </summary>
 	public required string Subject { get; init; }
+
+	/// <summary>
+	/// The authentication scheme that established <see cref="Subject"/>, or
+	/// <see langword="null"/> when unknown. This is the subject's origin scheme, not the
+	/// ticket's own scheme.
+	/// </summary>
+	public string? Scheme { get; init; }
 
 	/// <summary>
 	/// Absolute expiry. Validators reject tickets after this instant; short TTLs
