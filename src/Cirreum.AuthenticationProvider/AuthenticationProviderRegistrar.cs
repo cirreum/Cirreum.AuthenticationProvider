@@ -53,19 +53,9 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 	/// Whether this provider authenticates people or machines.
 	/// </summary>
 	/// <remarks>
-	/// <para>
-	/// A constant of the provider, not of any instance: a scheme package knows what it
-	/// authenticates, so the framework never has to guess from a token's contents. Guessing is
-	/// what it used to do — an absent name claim was read as "this is a machine", which is wrong
-	/// for every thin token issued to a real person.
-	/// </para>
-	/// <para>
-	/// Deliberately <see langword="abstract"/> rather than defaulted: a provider that never
-	/// answers is a provider whose callers cannot be classified, and that should be a compile
-	/// error rather than a silent <see cref="Security.SubjectKind.Unknown"/> discovered in
-	/// production. Answer it from what the provider authenticates, never from its transport —
-	/// header-based does not imply machine, as session tickets carry people.
-	/// </para>
+	/// A constant of the provider, not of any instance — a scheme package knows what it
+	/// authenticates. Answer from that, never from the credential transport: header-based does
+	/// not imply <see cref="Security.SubjectKind.Machine"/>, since session tickets carry people.
 	/// </remarks>
 	public abstract SubjectKind SubjectKind { get; }
 
@@ -138,11 +128,10 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 		this.ValidateSettings(settings);
 
 		// Publish what this scheme declares, for the map the runtime builds at composition close.
-		// Anchored on the registered scheme rather than the configured instance: the two are
-		// usually the same, but a provider whose credentials resolve dynamically can register a
-		// scheme with no configured instances at all, and that scheme contributes from its own
-		// composition verb instead. Contributed after validation, so an instance that fails never
-		// declares anything.
+		// Anchored on the registered scheme, not the configured instance: a provider whose
+		// credentials resolve dynamically can register a scheme with no configured instances at
+		// all, and contributes from its own composition verb instead. After validation, so an
+		// instance that fails declares nothing.
 		services.AddSingleton(new SchemeClaimAuthorityRegistration(
 			key,
 			this.SubjectKind,
