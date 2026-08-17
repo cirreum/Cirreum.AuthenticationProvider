@@ -2,7 +2,6 @@ namespace Cirreum.AuthenticationProvider;
 
 using Cirreum.AuthenticationProvider.Configuration;
 using Cirreum.Providers;
-using Cirreum.Providers.Configuration;
 using Cirreum.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -55,7 +54,7 @@ public abstract class AuthenticationProviderRegistrar<TSettings, TInstanceSettin
 	/// <remarks>
 	/// A constant of the provider, not of any instance — a scheme package knows what it
 	/// authenticates. Answer from that, never from the credential transport: header-based does
-	/// not imply <see cref="Security.SubjectKind.Machine"/>, since session tickets carry people.
+	/// not imply <see cref="SubjectKind.Machine"/>, since session tickets carry people.
 	/// </remarks>
 	public abstract SubjectKind SubjectKind { get; }
 
