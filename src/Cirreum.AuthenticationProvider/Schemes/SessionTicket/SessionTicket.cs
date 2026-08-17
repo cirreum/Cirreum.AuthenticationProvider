@@ -22,9 +22,8 @@ namespace Cirreum.AuthenticationProvider.SessionTicket;
 public sealed record SessionTicket {
 
 	/// <summary>
-	/// The opaque ticket value as carried on the wire (subprotocol, cookie, query, or
-	/// JWT bearer). Validation contract: the value uniquely identifies the ticket;
-	/// callers MUST NOT parse semantics out of it directly.
+	/// The opaque ticket value as carried on the wire. The value uniquely identifies the
+	/// ticket; callers must not parse semantics out of it.
 	/// </summary>
 	public required string TicketValue { get; init; }
 

@@ -51,8 +51,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
   | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApi(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
   | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, AuthenticationBuilder)` | `AddAuthenticationForWebApp(IConfigurationSection, TInstanceSettings, IAuthenticationBuilder)` |
 
-- `SessionTicket` record docs no longer describe a JWT variant — dropped from the roadmap; the
-  opaque store-validated ticket is the product.
+- `SessionTicket` record docs no longer describe a JWT variant or enumerate transports — the
+  opaque store-validated ticket is the product, and transports are the scheme package's concern.
 - **`RegisterInstance` no longer contributes `SchemeClaimAuthorityRegistration`.** The 3.0.0
   contribution was keyed on the instance key, which is not the scheme name for multi-transport
   providers (`ApiKey:{transport}`) — a record no lookup would ever find. The declaration now
