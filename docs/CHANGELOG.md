@@ -8,6 +8,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Updated
+
+- Updated NuGet packages — `Cirreum.Contracts` 4.2.1, `Cirreum.Coordination` 1.3.1,
+  `Cirreum.Providers` 1.3.1.
+
 ### Breaking
 
 - **`AuthenticationProviderRegistrar<,>` gains an abstract `SubjectKind`.** Every registrar now
