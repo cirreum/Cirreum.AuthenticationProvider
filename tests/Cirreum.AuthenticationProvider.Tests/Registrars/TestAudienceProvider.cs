@@ -32,14 +32,14 @@ internal sealed class TestAudienceRegistrar : AudienceAuthenticationProviderRegi
 	public override void AddAuthenticationForWebApi(
 		IConfigurationSection instanceSection,
 		TestAudienceInstanceSettings providerSettings,
-		AuthenticationBuilder authBuilder) {
+		IAuthenticationBuilder builder) {
 		this.WebApiSchemes.Add(providerSettings.Scheme);
 	}
 
 	public override void AddAuthenticationForWebApp(
 		IConfigurationSection instanceSection,
 		TestAudienceInstanceSettings providerSettings,
-		AuthenticationBuilder authBuilder) {
+		IAuthenticationBuilder builder) {
 		this.WebAppSchemes.Add(providerSettings.Scheme);
 	}
 

@@ -32,7 +32,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var registrar = new TestAudienceRegistrar();
 		var settings = CreateSettings(("descope", "aud-project-id", true));
 
-		registrar.Register(settings, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		registrar.Register(settings, new TestAuthenticationBuilder(services));
 
 		var registration = Registrations(services).Should().ContainSingle().Subject;
 		registration.Audience.Should().Be("aud-project-id");
@@ -51,7 +51,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 			("entraWorkforce", "aud-workforce", true),
 			("entraExternal", "aud-external", true));
 
-		registrar.Register(settings, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		registrar.Register(settings, new TestAuthenticationBuilder(services));
 
 		Registrations(services).Select(r => (r.Audience, r.Scheme)).Should().BeEquivalentTo([
 			("aud-descope", "descope"),
@@ -66,7 +66,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var registrar = new TestAudienceRegistrar();
 		var settings = CreateSettings(("descope", "aud-descope", false));
 
-		registrar.Register(settings, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		registrar.Register(settings, new TestAuthenticationBuilder(services));
 
 		Registrations(services).Should().BeEmpty();
 		registrar.WebApiSchemes.Should().BeEmpty();
@@ -78,7 +78,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var registrar = new TestAudienceRegistrar();
 		var settings = CreateSettings(("descope", "aud-descope", true));
 
-		registrar.Register(settings, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		registrar.Register(settings, new TestAuthenticationBuilder(services));
 
 		registrar.WebApiSchemes.Should().BeEquivalentTo(["descope"]);
 		registrar.WebAppSchemes.Should().BeEmpty();
@@ -90,7 +90,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var registrar = new TestAudienceRegistrar();
 		var settings = CreateSettings(("descope", "", true));
 
-		var act = () => registrar.Register(settings, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		var act = () => registrar.Register(settings, new TestAuthenticationBuilder(services));
 
 		act.Should().Throw<InvalidOperationException>()
 			.WithMessage("*Audience*");
@@ -102,7 +102,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var registrar = new TestAudienceRegistrar();
 		var instance = CreateInstance("aud-descope");
 
-		registrar.RegisterInstance("descope", instance, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		registrar.RegisterInstance("descope", instance, new TestAuthenticationBuilder(services));
 
 		instance.Scheme.Should().Be("descope");
 	}
@@ -114,7 +114,7 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		var instance = CreateInstance("aud-descope");
 		instance.Scheme = "other";
 
-		var act = () => registrar.RegisterInstance("descope", instance, services, EmptyConfiguration, new AuthenticationBuilder(services));
+		var act = () => registrar.RegisterInstance("descope", instance, new TestAuthenticationBuilder(services));
 
 		act.Should().Throw<InvalidOperationException>()
 			.WithMessage("*Scheme*");
@@ -123,12 +123,12 @@ public class AudienceAuthenticationProviderRegistrarTests {
 	[Fact]
 	public void RegisterInstance_DuplicateKeyInSameCollection_Throws() {
 		var services = new ServiceCollection();
-		var authBuilder = new AuthenticationBuilder(services);
+		var authBuilder = new TestAuthenticationBuilder(services);
 		new TestAudienceRegistrar()
-			.RegisterInstance("descope", CreateInstance("aud-1"), services, EmptyConfiguration, authBuilder);
+			.RegisterInstance("descope", CreateInstance("aud-1"), authBuilder);
 
 		var act = () => new TestAudienceRegistrar()
-			.RegisterInstance("descope", CreateInstance("aud-2"), services, EmptyConfiguration, authBuilder);
+			.RegisterInstance("descope", CreateInstance("aud-2"), authBuilder);
 
 		act.Should().Throw<InvalidOperationException>()
 			.WithMessage("*descope*");
@@ -140,11 +140,11 @@ public class AudienceAuthenticationProviderRegistrarTests {
 		// collection-scoped, not process-global.
 		var first = new ServiceCollection();
 		new TestAudienceRegistrar()
-			.RegisterInstance("descope", CreateInstance("aud-1"), first, EmptyConfiguration, new AuthenticationBuilder(first));
+			.RegisterInstance("descope", CreateInstance("aud-1"), new TestAuthenticationBuilder(first));
 
 		var second = new ServiceCollection();
 		var act = () => new TestAudienceRegistrar()
-			.RegisterInstance("descope", CreateInstance("aud-1"), second, EmptyConfiguration, new AuthenticationBuilder(second));
+			.RegisterInstance("descope", CreateInstance("aud-1"), new TestAuthenticationBuilder(second));
 
 		act.Should().NotThrow();
 	}

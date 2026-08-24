@@ -8,6 +8,30 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Added
+
+* **`BearerCredential`** — the single reader for an inbound bearer credential, used by both
+  scheme selectors, which choose the handling scheme, and scheme handlers, which validate it.
+  Reads `Authorization: Bearer`, and otherwise the `access_token` query parameter when the
+  request targets a connection endpoint. A browser cannot set
+  headers on a WebSocket upgrade, so a query-carried token is the only credential such a
+  client can present, and it is the convention SignalR's own clients follow. The header always
+  wins, and the query is never consulted for an ordinary endpoint, so a query parameter
+  outside a connection upgrade carries no authority.
+  Connection endpoints are recognized two ways: a SignalR hub by SignalR's own hub metadata,
+  and everything else by `InvocationConnectionMetadata`, which ships in `Cirreum.Contracts`
+  4.7.0 and which the server spine stamps on the connection endpoints it maps.
+
+### Fixed
+
+* **The test suite compiles again.** Its registrar doubles and call sites still used the
+  pre-consolidation signatures — `AuthenticationBuilder` in place of `IAuthenticationBuilder`,
+  and `Register` / `RegisterInstance` taking the service collection and configuration
+  separately rather than the composed builder — so the project had not built since that
+  consolidation. Release runs skip test solutions by default, which is why no release caught
+  it. The doubles are updated and a `TestAuthenticationBuilder` supplies the interface, whose
+  shipping implementation lives above this layer.
+
 ## [3.0.5] - 2026-08-23
 
 ### Updated
