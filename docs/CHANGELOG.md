@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-08-23
+
 ### Added
 
 * **`BearerCredential`** — the single reader for an inbound bearer credential, used by both
