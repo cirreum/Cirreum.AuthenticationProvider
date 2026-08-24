@@ -8,6 +8,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-08-24
+
+### Changed
+
+* **Removed the dormant `BearerCredential` reader.** Shipped in 3.1.0 to let every scheme
+  selector and handler read a query-carried credential, for the case a browser cannot avoid:
+  it can set no headers on a WebSocket upgrade, so its bearer token arrives as an
+  `access_token` query parameter.
+
+  That approach was replaced before anything adopted it. `Cirreum.Services.Server` 1.6.0
+  promotes such a credential into the `Authorization` header before authentication runs, so
+  every scheme and selector reads it where it always has and none of them need to know the
+  case exists — including schemes added later, and the JWT audience-routing selector in
+  `Cirreum.Runtime.Authentication`, which the per-scheme approach would have missed.
+
+  Deleted under the dormant-surface rule: no framework code called either member, and public
+  surface nothing consumes is surface that accumulates consumers by accident. Shipped as a
+  Minor deliberately — with zero consumers, the removal cannot break a compile anywhere.
+
+
 ## [3.1.0] - 2026-08-23
 
 ### Added

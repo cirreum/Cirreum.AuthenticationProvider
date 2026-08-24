@@ -33,7 +33,6 @@ It sits between individual authentication scheme packages and the runtime that c
 
 - `ISchemeSelector` / `SchemeCategory` — per-request authentication scheme selection
 - `CredentialTransport` — identifies where a scheme receives its credential
-- `BearerCredential` — reads the inbound bearer credential for both selectors and handlers: `Authorization: Bearer`, or the `access_token` query parameter on a connection endpoint, which is the only credential a browser can present on a WebSocket upgrade
 - `ISignedRequestAlgorithm` and resolver — pluggable SignedRequest algorithms
 - `SessionTicket` contracts — HTTP-to-long-lived-connection authentication handoff
 

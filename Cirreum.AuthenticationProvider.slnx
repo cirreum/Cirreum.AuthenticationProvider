@@ -22,6 +22,7 @@
     <File Path="docs/RELEASE-NOTES-v3.0.0.md" />
     <File Path="docs/RELEASE-NOTES-v3.0.1.md" />
     <File Path="docs/RELEASE-NOTES-v3.1.0.md" />
+    <File Path="docs/RELEASE-NOTES-v3.2.0.md" />
   </Folder>
   <Folder Name="/publish/">
     <File Path=".github/workflows/publish.yml" />
