@@ -8,6 +8,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+### Updated
+
+- **`IRevokedCredentialProvider` documents what its result set must cover.** The remarks stated
+  how long a revocation must be retained, but not which credentials have to appear in the set to
+  begin with: it must cover every credential a scheme's credential resolver can still return.
+
 ## [3.2.0] - 2026-08-24
 
 ### Changed

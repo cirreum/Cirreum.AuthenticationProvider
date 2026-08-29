@@ -16,6 +16,10 @@ namespace Cirreum.AuthenticationProvider;
 /// A revocation must not be removed while its credential could still authenticate, as doing
 /// so would make the credential valid again.
 /// </para>
+/// <para>
+/// The set must cover every credential a scheme's credential resolver can still return. A
+/// credential the resolver no longer returns requires no revocation entry.
+/// </para>
 /// </remarks>
 public interface IRevokedCredentialProvider {
 
