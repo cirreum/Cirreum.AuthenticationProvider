@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [3.2.1] - 2026-08-29
+
 ### Updated
 
 - **`IRevokedCredentialProvider` documents what its result set must cover.** The remarks stated
