@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) — [SemVer](ht
 
 ## [Unreleased]
 
+## [3.2.3] - 2026-10-26
+
 ### Updated
 
 - **`Cirreum.Contracts`** — `6.1.0` → `6.2.0`. Picks up host invocations (`IHostInvocationFactory`, `StartDetached`, the `Cirreum.Host` scheme).
